@@ -166,7 +166,7 @@ class PAW(PAWTextOutput):
             
             if key in ['fixmom', 'mixer',
                        'verbose', 'txt', 'hund', 'random',
-                       'eigensolver', 'idiotproof', 'notify']:
+                       'eigensolver', 'idiotproof', 'notify', 'lft']:
                 continue
 
             if key in ['convergence', 'fixdensity', 'maxiter']:
@@ -421,7 +421,7 @@ class PAW(PAWTextOutput):
 
         # K-point descriptor
         bzkpts_kc = kpts2ndarray(par.kpts, self.atoms)
-        kd = KPointDescriptor(bzkpts_kc, nspins, collinear)
+        kd = KPointDescriptor(bzkpts_kc, nspins, collinear, par.lft)
 
         width = par.width
         if width is None:

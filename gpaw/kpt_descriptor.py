@@ -56,7 +56,7 @@ def to1bz(bzk_kc, cell_cv):
 class KPointDescriptor:
     """Descriptor-class for k-points."""
 
-    def __init__(self, kpts, nspins=1, collinear=True):
+    def __init__(self, kpts, nspins=1, collinear=True, lft=False):
         """Construct descriptor object for kpoint/spin combinations (ks-pair).
 
         Parameters
@@ -110,8 +110,8 @@ class KPointDescriptor:
         self.nbzkpts = len(self.bzk_kc)
         
         # Gamma-point calculation?
+        self.lft = lft
         self.gamma = self.nbzkpts == 1 and not self.bzk_kc[0].any()
-            
         self.set_symmetry(None, None, usesymm=None)
         self.set_communicator(mpi.serial_comm)
 
@@ -168,7 +168,8 @@ class KPointDescriptor:
 
             # Construct a Symmetry instance containing the identity operation
             # only
-            self.symmetry = Symmetry(id_a, atoms.cell / Bohr, atoms.pbc)
+            self.symmetry = Symmetry(id_a, atoms.cell / Bohr, atoms.pbc, fractrans=self.lft)
+            self.lft = self.symmetry.lft
         else:
             self.symmetry = None
         

@@ -1,7 +1,8 @@
 
-bin/
+build/
 .svn/
 
+*.log
 *.o
 *.pyc
 
