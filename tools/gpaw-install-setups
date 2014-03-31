@@ -1,0 +1,126 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import urllib2
+from StringIO import StringIO
+import tarfile
+from tarfile import TarFile
+from optparse import OptionParser
+
+usage = '%prog [OPTION] [DIR]'
+description = ('Download and install gpaw-setups into DIR if given, '
+               'otherwise print current GPAW setup search paths.')
+
+baseurl = 'https://wiki.fysik.dtu.dk/gpaw-files'
+
+# This is the "safe" way but it's difficult to keep this updated
+# We could change it so it just greps filenames from the webpage
+names = {'0.9': 'gpaw-setups-0.9.9672.tar.gz',
+         '0.8': 'gpaw-setups-0.8.7929.tar.gz',
+         '0.6': 'gpaw-setups-0.6.6300.tar.gz',
+         '0.5': 'gpaw-setups-0.5.3574.tar.gz'}
+
+versions = names.keys()
+versions.sort()
+default_version = versions[-1]
+
+
+p = OptionParser(usage=usage, description=description)
+p.add_option('--version', metavar='VERSION', default=default_version,
+             help='download VERSION of gpaw-setups.  One of %s'
+             % ', '.join(versions))
+p.add_option('--tarball', metavar='FILENAME',
+             help='unpack and install from local tarball FILENAME '
+             'instead of downloading from the GPAW website')
+opts, args = p.parse_args()
+
+nargs = len(args)
+
+def print_setups_info():
+    try:
+        import gpaw
+    except ImportError, e:
+        p.error("Cannot import 'gpaw'.  GPAW does not appear to be installed."
+                " %s" % e)
+    npaths = len(gpaw.setup_paths)
+    if npaths == 0:
+        print 'GPAW currently has no setup search paths'
+    else:
+        print 'GPAW setup paths in order of search priority:'
+        for path in gpaw.setup_paths:
+            print path
+
+
+if nargs == 0:
+    print_setups_info()
+    raise SystemExit
+elif len(args) != 1:
+    p.error('No more than one DIR expected.  Please try --help.')
+
+targetpath = args[0]
+tarfname = names[opts.version]
+url = '%s/%s' % (baseurl, tarfname)
+
+if opts.tarball:
+    print 'Reading local tarball %s' % opts.tarball
+    targzfile = tarfile.open(opts.tarball)
+else:
+    print 'Downloading version %s [%s]' % (opts.version, tarfname)
+    response = urllib2.urlopen(url)
+    targzfile = tarfile.open(fileobj=StringIO(response.read()))
+
+if not os.path.exists(targetpath):
+    os.makedirs(targetpath)
+
+print 'Extracting tarball into %s' % targetpath
+targzfile.extractall(targetpath)
+
+
+setup_dirname = tarfname.rsplit('.', 2)[0] # remove .tar.gz ending
+setup_path = os.path.abspath(os.path.join(targetpath, setup_dirname))
+assert os.path.isdir(setup_path)
+
+# Okay, now we have to maybe edit people's rc files.
+rcfiledir = os.path.join(os.environ['HOME'], '.gpaw')
+rcfilepath = os.path.join(rcfiledir, 'rc.py')
+
+print 'Setups installed into %s.' % setup_path
+
+# We could do all this by importing the rcfile as well and checking
+# whether things are okay or not.
+rcline1 = 'from gpaw import setup_paths'
+rcline2 = "setup_paths.insert(0, '%s')" % setup_path
+
+answer = raw_input('Register this setup path in %s? [y/n] ' % rcfilepath)
+
+if answer.lower() == 'y':
+    # First we create the file
+    if not os.path.exists(rcfiledir):
+        os.makedirs(rcfiledir)
+    if not os.path.exists(rcfilepath):
+        tmpfd = open(rcfilepath, 'w') # Just create empty file
+        tmpfd.close()
+
+    for line in open(rcfilepath):
+        if line.startswith(rcline2):
+            print 'It looks like the path is already registered in %s.' \
+                % rcfilepath
+            print 'File will not be modified at this time.'
+            break
+    else:
+        rcfd = open(rcfilepath, 'a')
+        print >> rcfd, rcline1
+        print >> rcfd, rcline2
+        print 'Setup path has been registered in %s.' % rcfilepath
+else:
+    if answer.lower() != 'n':
+        print 'What do you mean by "%s"?  Assuming "n".' % answer
+    else:
+        print 'As you wish.'
+    print 'You can manually write the following two lines to %s:' % rcfilepath
+    print 
+    print rcline1
+    print rcline2
+    print
+print 'Installation complete.'

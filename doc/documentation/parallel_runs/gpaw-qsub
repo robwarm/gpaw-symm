@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+# Emacs: treat this as -*- python -*-
+
+from sys import argv
+import os
+
+i = 1
+while not (os.path.isfile(argv[i]) and (argv[i].endswith('.py') or
+                                        os.access(argv[i], os.X_OK))):
+    i += 1
+
+options = ' '.join(argv[1:i])
+script = argv[i]
+job = ' '.join(argv[i:])
+
+qsub = '#!/usr/bin/env python\n'
+qsub += '#PBS -N %s\n' % script.split('/')[-1] # set default job name
+qsub += '#PBS -W umask=002\n'
+
+for line in open(script, 'r'):
+    if line.startswith('#PBS'):
+        qsub += line
+
+qsub += """\
+import os
+import sys
+from gpaw import get_gpaw_python_path
+
+nodename = os.uname()[1]
+c = nodename[0]
+assert c in 'abcdghnmqp'
+
+# use mpi_paffinity_alone if set as environment variable
+# http://www.open-mpi.de/faq/?category=tuning#setting-mca-params
+if os.environ.get('OMPI_MCA_mpi_paffinity_alone'):
+    mpi_paffinity_alone = '--mca mpi_paffinity_alone '+os.environ.get('OMPI_MCA_mpi_paffinity_alone')
+else:
+    mpi_paffinity_alone = ''
+
+np = len(open(os.environ['PBS_NODEFILE']).readlines())
+
+if c in 'abcd':
+    # Intel Niflheim node:
+    if not (np % 8):
+        mpiexec = 'mpiexec ' + mpi_paffinity_alone
+    else:
+        # do not use mpi_paffinity_alone on partially filled nodes
+        mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec '
+elif c in 'gh':
+    # Intel Niflheim node:
+    if not (np % 16):
+        mpiexec = 'mpiexec --mca btl ^tcp ' + mpi_paffinity_alone
+    else:
+        # do not use mpi_paffinity_alone on partially filled nodes
+        mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec --mca btl ^tcp '
+elif c in 'nmpq':
+    # Opteron Niflheim node:
+    if not (np % 4):
+        mpiexec = 'mpiexec ' + mpi_paffinity_alone
+    else:
+        # do not use mpi_paffinity_alone on partially filled nodes
+        mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec '
+    vers = sys.version[:3]
+else:
+    raise RuntimeError('Unknown node type')
+"""
+
+# Start script:
+qsub += """
+path = get_gpaw_python_path()
+retcode = os.system('''%s %s/gpaw-python JOB''' % (mpiexec, path))
+if (retcode & 0xff) == 0:
+    sys.exit(retcode >> 8)  # No signal, return the status only.
+else:
+    sys.exit(retcode)  # Return everything, signalling failure.
+""".replace('JOB',
+            job.replace('(', '\\(').replace(')', '\\)').replace("'", "\\'"))
+
+os.popen('qsub ' + options, 'w').write(qsub)
