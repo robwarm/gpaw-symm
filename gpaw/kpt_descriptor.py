@@ -186,8 +186,26 @@ class KPointDescriptor:
             if usesymm:
                 # Find symmetry operations of atoms
                 self.symmetry.analyze(atoms.get_scaled_positions())
-                
+              
                 if N_c is not None:
+                    if self.lft:
+                        # the factor (denominator) the grid must follow
+                        factor = np.ones(3)
+                        indexes = np.where(np.abs(self.symmetry.ft_sc) > 1e-3)
+                        for i in range(len(indexes[0])):
+                            # find smallest common denominator
+                            a = factor[indexes[1][i]]
+                            b = np.rint(1. /  self.symmetry.ft_sc[indexes[0][i]][indexes[1][i]])
+                            factor[indexes[1][i]] = a*b
+                            while b != 0:
+                                rem = a % b
+                                a = b
+                                b = rem
+                            factor[indexes[1][i]] /= a 
+                        Nnew_c = np.array(np.rint(N_c / factor)*factor,int)
+                        # make sure new grid is not less dense
+                        Nnew_c = np.array(np.where(Nnew_c >= N_c, Nnew_c, Nnew_c+factor), int)
+                        N_c = Nnew_c
                     self.symmetry.prune_symmetries_grid(N_c)
 
             (self.ibzk_kc, self.weight_k,
@@ -206,6 +224,8 @@ class KPointDescriptor:
             self.nks = self.nibzkpts * self.nspins
         else:
             self.nks = self.nibzkpts
+
+        return N_c
 
     def set_communicator(self, comm):
         """Set k-point communicator."""
