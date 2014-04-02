@@ -43,9 +43,9 @@ class Symmetry:
         self.lft = fractrans
         # disable fractional translations for non-periodic boundary conditions,
         # because i do not know, whether it should work or not.
-        if not all(p == True for p in self.pbc_c):
-            self.lft = False
-            print "Warning: Disabled fractional translations -> pbc"
+      #  if not all(p == True for p in self.pbc_c):
+      #      self.lft = False
+      #      print "Warning: Disabled fractional translations -> pbc"
         
 
         self.op_scc = np.identity(3, int).reshape((1, 3, 3))
@@ -370,6 +370,8 @@ class Symmetry:
         
         n = len(self.op_scc)
         text('Symmetries present: %s' % n)
+        if any(self.lft_s):
+            text('Found fractional translations')
 
 
 def map_k_points(bzk_kc, U_scc, inversion, comm=None, tol=1e-11):
