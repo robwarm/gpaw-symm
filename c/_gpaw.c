@@ -26,6 +26,7 @@ PyObject* craypat_region_end(PyObject *self, PyObject *args);
 
 
 PyObject* symmetrize(PyObject *self, PyObject *args);
+PyObject* symmetrize_ft(PyObject *self, PyObject *args);
 PyObject* symmetrize_wavefunction(PyObject *self, PyObject *args);
 PyObject* symmetrize_return_index(PyObject *self, PyObject *args);
 PyObject* symmetrize_with_index(PyObject *self, PyObject *args);
@@ -113,6 +114,7 @@ PyObject* mlsqr(PyObject *self, PyObject *args);
 
 static PyMethodDef functions[] = {
   {"symmetrize", symmetrize, METH_VARARGS, 0},
+  {"symmetrize_ft", symmetrize_ft, METH_VARARGS, 0},
   {"symmetrize_wavefunction", symmetrize_wavefunction, METH_VARARGS, 0},
   {"symmetrize_return_index", symmetrize_return_index, METH_VARARGS, 0},
   {"symmetrize_with_index", symmetrize_with_index, METH_VARARGS, 0},

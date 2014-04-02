@@ -307,6 +307,12 @@ class Symmetry:
         
         gd.symmetrize(a, self.op_scc)
 
+    def symmetrize_ft(self, a, gd):
+        """Symmetrize array, including fractional translations."""
+        
+        gd.symmetrize(a, self.op_scc, self.ft_sc)
+
+
     def symmetrize_wavefunction(self, a_g, kibz_c, kbz_c, op_cc,
                                 time_reversal):
         """Generate Bloch function from symmetry related function in the IBZ.

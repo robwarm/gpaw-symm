@@ -48,7 +48,7 @@ PyObject* symmetrize_ft(PyObject *self, PyObject *args)
     PyArrayObject* op_cc_obj;
     PyArrayObject* ft_c_obj;
    
-    if (!PyArg_ParseTuple(args, "OOO", &a_g_obj, &b_g_obj, &op_cc_obj, &ft_c_obj)) 
+    if (!PyArg_ParseTuple(args, "OOOO", &a_g_obj, &b_g_obj, &op_cc_obj, &ft_c_obj)) 
         return NULL;
 
     const double* ft = (const double*)PyArray_DATA(ft_c_obj);

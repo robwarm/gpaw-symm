@@ -415,7 +415,7 @@ class GridDescriptor(Domain):
         if self.comm.rank == 0:
             B_g = np.zeros_like(A_g)
             for i, op_cc in enumerate(op_scc):
-                if ft == None:
+                if ft_sc == None:
                     _gpaw.symmetrize(A_g, B_g, op_cc)
                 else:
                     _gpaw.symmetrize_ft(A_g, B_g, op_cc, ft_sc[i])
