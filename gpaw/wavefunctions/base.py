@@ -108,7 +108,7 @@ class WaveFunctions(EmptyWaveFunctions):
         
         self.timer.start('Symmetrize density')
         for nt_G in nt_sG:
-            self.symmetry.symmetrize(nt_G, self.gd)
+            self.symmetry.symmetrize_ft(nt_G, self.gd)
         self.timer.stop('Symmetrize density')
 
     def add_to_density_from_k_point(self, nt_sG, kpt):
