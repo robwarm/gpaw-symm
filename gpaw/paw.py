@@ -362,6 +362,9 @@ class PAW(PAWTextOutput):
         if mode == 'pw':
             mode = PW()
 
+        if mode == 'fd':
+            par.lft = False
+
         if par.realspace is None:
             realspace = not isinstance(mode, PW)
         else:
