@@ -163,11 +163,16 @@ class Symmetry:
                     #print ft
                     ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft, a_ib)
                     if ok:
-                        #print "found fractional translation", ft
-                        opok.append(op_cc)
-                        #if len(self.opnum_s) > 0: opnumok.append(self.opnum_s[i])
-                        a_sa.append(a_a)
-                        opftok.append(ft)
+                        # fractional translations must commensurate with the grids
+                        # else we have nothing but trouble.
+                        # To ensure this, we only accept fractional translations,
+                        # which are rational, eg. 1/2, 1/3 etc
+                        invft = np.where( np.abs(ft) > 0.1, np.abs(1./ft), 0.)
+                        if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0))):
+                            opok.append(op_cc)
+                            #if len(self.opnum_s) > 0: opnumok.append(self.opnum_s[i])
+                            a_sa.append(a_a)
+                            opftok.append(ft)
 
         self.a_sa = np.array(a_sa)
         self.op_scc = np.array(opok)
@@ -307,6 +312,12 @@ class Symmetry:
         
         gd.symmetrize(a, self.op_scc)
 
+    def symmetrize_ft_no(self, a, gd):
+        """Symmetrize array, excluding fractional translation."""
+        print np.where(self.lft_s==False)[0]
+        op_scc = self.op_scc[np.where(self.lft_s==False)[0]]
+        gd.symmetrize(a, op_scc)
+
     def symmetrize_ft(self, a, gd):
         """Symmetrize array, including fractional translations."""
         
@@ -370,7 +381,7 @@ class Symmetry:
         
         n = len(self.op_scc)
         text('Symmetries present: %s' % n)
-        if any(self.lft_s):
+        if np.any(self.lft_s):
             text('Found fractional translations')
 
 
