@@ -111,7 +111,7 @@ def get_realspace_hs(h_skmm, s_kmm, bzk_kc, weight_k,
         # For now this part seems to do the job, but it may be written
         # in a smarter way in the future.
         symmetry = Symmetry([1], np.eye(3))
-        symmetry.prune_symmetries(np.zeros((1, 3)))
+        symmetry.prune_symmetries_atoms(np.zeros((1, 3)))
         ibzk_kc, ibzweight_k = symmetry.reduce(bzk_kc)[:2]
         ibzk_t_kc, weights_t_k = symmetry.reduce(bzk_t_kc)[:2]
         ibzk_t_kc = ibzk_t_kc[:, :2]
