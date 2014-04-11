@@ -168,7 +168,7 @@ class Symmetry:
                         # To ensure this, we only accept fractional translations,
                         # which are rational, eg. 1/2, 1/3 etc
                         invft = np.where( np.abs(ft) > 0.1, np.abs(1./ft), 0.)
-                        if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0))):
+                        if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0)), atol=1e-5):
                             opok.append(op_cc)
                             #if len(self.opnum_s) > 0: opnumok.append(self.opnum_s[i])
                             a_sa.append(a_a)
@@ -314,15 +314,16 @@ class Symmetry:
 
     def symmetrize_ft_no(self, a, gd):
         """Symmetrize array, excluding fractional translation."""
-        print np.where(self.lft_s==False)[0]
+        #print np.where(self.lft_s==False)[0]
         op_scc = self.op_scc[np.where(self.lft_s==False)[0]]
         gd.symmetrize(a, op_scc)
 
     def symmetrize_ft(self, a, gd):
         """Symmetrize array, including fractional translations."""
-        
-        gd.symmetrize(a, self.op_scc, self.ft_sc)
-
+        if np.any(self.lft_s):
+            gd.symmetrize(a, self.op_scc, self.ft_sc)
+        else:
+            gd.symmetrize(a, self.op_scc)
 
     def symmetrize_wavefunction(self, a_g, kibz_c, kbz_c, op_cc,
                                 time_reversal):
