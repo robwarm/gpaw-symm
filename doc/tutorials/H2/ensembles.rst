@@ -16,12 +16,9 @@ probability (see article [Mor05b]_ for details).
 
 .. literalinclude:: ensembles.py
 
-The result of running the script is::
+The script produces a text file named ensemble_energies.txt containing::
 
-  $[tutorial] python ensemble.py
-  PBE: 4.86356776525 eV
-  Best fit: 4.88357107434 +- 0.0991628571201 eV
-
+.. literalinclude:: ensembles_energies.txt
 
 * You must run the :ref:`atomization <atomization_energy>` script first.
 

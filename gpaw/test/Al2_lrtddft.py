@@ -11,7 +11,7 @@ debug = False
 use_hdf5 = True
 
 try:
-    import _hdf5
+    import _gpaw_hdf5
     restart_file = 'Al2_gs.hdf5'
 except ImportError:
     restart_file = 'Al2_gs.gpw'

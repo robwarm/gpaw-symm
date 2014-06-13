@@ -407,21 +407,15 @@ class GridDescriptor(Domain):
         N_c = self.N_c
         return np.exp(2j * pi * np.dot(np.indices(N_c).T, k_c / N_c).T)
 
-    def symmetrize(self, a_g, op_scc, ft_sc=None):
+    def symmetrize(self, a_g, op_scc):
         if len(op_scc) == 1:
             return
         
         A_g = self.collect(a_g)
         if self.comm.rank == 0:
             B_g = np.zeros_like(A_g)
-            for i, op_cc in enumerate(op_scc):
-                if ft_sc == None:
-                    _gpaw.symmetrize(A_g, B_g, op_cc)
-                else:
-                    #B_g = np.zeros_like(A_g)
-                    _gpaw.symmetrize_ft(A_g, B_g, op_cc, ft_sc[i])
-                   # print 'symmetrize ',i, ft_sc[i]
-                   # print B_g[0][0]
+            for op_cc in op_scc:
+                _gpaw.symmetrize(A_g, B_g, op_cc)
         else:
             B_g = None
         self.distribute(B_g, a_g)

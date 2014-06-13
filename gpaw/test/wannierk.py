@@ -45,14 +45,14 @@ def wan(calc):
         view(watoms)
     return x
 
+calc1 = GPAW('Si-bz.gpw', txt=None, communicator=serial_comm)
+x1 = wan(calc1)
+calc2 = GPAW('Si-ibz.gpw', txt=None, communicator=serial_comm)
+calc2.wfs.ibz2bz(si)
+x2 = wan(calc2)
 if world.rank == 0:
-    calc1 = GPAW('Si-bz.gpw', txt=None, communicator=serial_comm)
-    x1 = wan(calc1)
-    calc2 = GPAW('Si-ibz.gpw', txt=None, communicator=serial_comm)
-    calc2.wfs.ibz2bz(si)
-    x2 = wan(calc2)
     print x1,x2
-    assert abs(x1 - x2) < 0.001
-    assert abs(x1 - 9.71) < 0.01
+assert abs(x1 - x2) < 0.001
+assert abs(x1 - 9.71) < 0.01
 
 world.barrier()

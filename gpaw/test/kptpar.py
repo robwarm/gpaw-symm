@@ -23,8 +23,8 @@ if world.size >= 3:
 
     equal(e1, -2.23708481, energy_tolerance)
 
-    comm = world.new_communicator(np.array([0, 1, 2]))
     if world.rank < 3:
+        comm = world.new_communicator(np.array([0, 1, 2]))
         H.set_calculator(GPAW(kpts=[6, 6, 1],
                               spinpol=True,
                               communicator=comm,
@@ -32,3 +32,10 @@ if world.size >= 3:
         e2 = H.get_potential_energy()
         assert H.get_calculator().wfs.kpt_comm.size == 3
         equal(e1, e2, 5e-9)
+    else:
+        comm = world.new_communicator(np.array(range(3, world.size)))
+        H.set_calculator(GPAW(kpts=[6, 6, 1],
+                              spinpol=True,
+                              communicator=comm,
+                              txt='H-b2.txt'))
+        e2 = H.get_potential_energy()

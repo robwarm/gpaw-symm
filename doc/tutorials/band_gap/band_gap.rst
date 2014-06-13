@@ -8,7 +8,7 @@ In this tutorial, we use the GLLB-sc to calculate the band gap of KTaO3 using th
 XC functional GLLB-sc. This functional uses the GLLB response potential to 
 replace the PBEsol response potential of the exchange. [GLLB-sc]
 This has been shown to improve the band gap description as shown in the figure 
-below taken from [Castilli2012].
+below taken from [Castelli2012].
 
 .. figure:: GLLB-SC_gap.png
 
@@ -32,7 +32,7 @@ but in the meanwhile please contact mikael.kuisma@tut.fi before using.
    *Kohn-Sham potential with discontinuity for band gap materials*,
    DOI: 10.1103/PhysRevB.82.115106
 
-.. [Castilli2012] Ivano E. Castelli, Thomas Olsen, Soumendu Datta,
+.. [Castelli2012] Ivano E. Castelli, Thomas Olsen, Soumendu Datta,
    David D. Landis, Søren Dahl, Kristian S. Thygesena
    and Karsten W. Jacobsen,
    Energy Environ. Sci., 2012, 5, 5814,

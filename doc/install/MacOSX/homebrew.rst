@@ -95,6 +95,7 @@ Installing GPAW requirements
 Install the following homebrew packages::
 
   brew install gfortran
+  brew install gcc
   brew install openmpi
   brew install libxc
 

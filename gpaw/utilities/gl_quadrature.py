@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # A. Pletzer Tue Mar 20 11:42:05 EST 2001
 # G. Genellina 2009-09-10: Minor syntax changes,
 #   compatibility with Python 2.4 and above

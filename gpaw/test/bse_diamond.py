@@ -3,7 +3,7 @@ from ase import Atom, Atoms
 from ase.lattice import bulk
 from ase.units import Hartree, Bohr
 from gpaw import GPAW, FermiDirac
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import Mixer
 from gpaw.response.bse import BSE
 

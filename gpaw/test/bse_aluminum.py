@@ -2,7 +2,7 @@ import numpy as np
 from ase.units import Bohr, Hartree
 from ase.lattice import bulk
 from gpaw import GPAW
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import Mixer
 from gpaw.response.df import DF
 from gpaw.response.bse import BSE

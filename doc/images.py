@@ -90,7 +90,7 @@ get('exercises/band_structure', ['silicon_banddiagram.png'])
 get('exercises/wavefunctions', ['co_bonding.jpg'])
 
 get('tutorials/bandstructures', ['sodium_bands.png'])
-get('tutorials/ensembles', ['ensemble.png'])
+get('tutorials/H2', ['ensemble.png'])
 
 get('.', ['2sigma.png', 'co_wavefunctions.png', 'molecules.png'], '_static')
 get('exercises/lrtddft', ['spectrum.png'])

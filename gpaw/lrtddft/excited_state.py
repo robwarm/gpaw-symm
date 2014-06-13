@@ -54,6 +54,9 @@ class FiniteDifferenceCalculator(Calculator):
                      file=self.txt)
         elif parallel > 0:
             mycomm, ncalcs, icalc = distribute_cpus(parallel, world)
+            if type(ncalcs) != type(1):
+                # this is ase < r3431
+                ncalcs = world.size / parallel
             self.parallel = { 'world' : world, 'mycomm' : mycomm, 
                               'ncalcs' : ncalcs, 'icalc' : icalc }
             self.calculator.set(communicator=mycomm)

@@ -3,7 +3,7 @@ require 'formula'
 class GpawSetups < Formula
   homepage 'https://wiki.fysik.dtu.dk/gpaw/'
   url 'https://wiki.fysik.dtu.dk/gpaw-files/gpaw-setups-0.9.11271.tar.gz'
-  sha1 '2c413af191f6418024ad15ef36986dca44ad4c7e'
+  sha1 'f9cfbdf50451930cbf7fbd32708f7202e6a7ac7c'
 
   def install
     Dir.mkdir 'gpaw-setups'

@@ -2,7 +2,7 @@ import numpy as np
 from ase.structure import molecule
 
 from gpaw import GPAW
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.lcao.projected_wannier import get_lcao_projections_HSP
 
 atoms = molecule('C2H2')

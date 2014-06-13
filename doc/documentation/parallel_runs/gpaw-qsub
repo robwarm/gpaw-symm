@@ -28,7 +28,7 @@ from gpaw import get_gpaw_python_path
 
 nodename = os.uname()[1]
 c = nodename[0]
-assert c in 'abcdghnmqp'
+assert c in 'abcdghinmqp'
 
 # use mpi_paffinity_alone if set as environment variable
 # http://www.open-mpi.de/faq/?category=tuning#setting-mca-params
@@ -46,7 +46,7 @@ if c in 'abcd':
     else:
         # do not use mpi_paffinity_alone on partially filled nodes
         mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec '
-elif c in 'gh':
+elif c in 'ghi':
     # Intel Niflheim node:
     if not (np % 16):
         mpiexec = 'mpiexec --mca btl ^tcp ' + mpi_paffinity_alone

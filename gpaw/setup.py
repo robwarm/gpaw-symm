@@ -36,11 +36,21 @@ def create_setup(symbol, xc='LDA', lmax=0,
         xc = XC(xc)
 
     if isinstance(type, str) and ':' in type:
+        # Parse DFT+U parameters from type-string:
+        # Examples: "type:l,U" or "type:l,U,scale"
         type, lu = type.split(':')
+        if type == '':
+            type = 'paw'
         l = 'spdf'.find(lu[0])
-        U = float(lu[2:]) / units.Hartree
+        assert lu[1] == ','
+        U = lu[2:]
+        if ',' in U:
+            U, scale = U.split(',')
+        else:
+            scale = True
+        U = float(U) / units.Hartree
+        scale = int(scale)
     else:
-        l = None
         U = None
 
     if setupdata is None:
@@ -74,7 +84,7 @@ def create_setup(symbol, xc='LDA', lmax=0,
     if hasattr(setupdata, 'build'):
         setup = LeanSetup(setupdata.build(xc, lmax, basis, filter))
         if U is not None:
-            setup.set_hubbard_u(U, l)
+            setup.set_hubbard_u(U, l, scale)
         return setup
     else:
         return setupdata

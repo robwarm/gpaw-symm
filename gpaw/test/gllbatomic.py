@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from ase import *
 from gpaw.atom.all_electron import AllElectron
 from gpaw.test import equal

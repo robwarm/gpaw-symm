@@ -5,7 +5,7 @@ import time
 from ase.units import Bohr
 from ase.lattice import bulk
 from gpaw import GPAW
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import Mixer
 from gpaw.atom.basis import BasisMaker
 from gpaw.response.df import DF

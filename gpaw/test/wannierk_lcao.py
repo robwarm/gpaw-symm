@@ -47,18 +47,17 @@ def wan(calc):
         view(watoms)
     return x
 
-if world.rank == 0:
-    calc1 = GPAW('Si-bz.gpw', txt=None, communicator=serial_comm)
-    # do full lcao initialization
-    #print('Re-Init LCAO calc')
-    _s = calc1.get_atoms()
-    calc1.set_positions(_s)
-    calc1.wfs.eigensolver.iterate(calc1.hamiltonian, calc1.wfs)
-    x1 = wan(calc1)
+calc1 = GPAW('Si-bz.gpw', txt=None, communicator=serial_comm)
+# do full lcao initialization
+#print('Re-Init LCAO calc')
+_s = calc1.get_atoms()
+calc1.set_positions(_s)
+calc1.wfs.eigensolver.iterate(calc1.hamiltonian, calc1.wfs)
+x1 = wan(calc1)
     
-    #print x1
-    x2 = 5.76962685681      # from FD mode
-    assert abs(x1 - x2) < 0.001
-    #assert abs(x1 - 9.71) < 0.01
+#print x1
+x2 = 5.76962685681      # from FD mode
+assert abs(x1 - x2) < 0.001
+#assert abs(x1 - 9.71) < 0.01
 
 world.barrier()

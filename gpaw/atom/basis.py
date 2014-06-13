@@ -13,8 +13,6 @@ from gpaw.atom.all_electron import AllElectron, ConvergenceError
 from gpaw.atom.generator import Generator
 from gpaw.atom.configurations import parameters
 from gpaw.atom.radialgd import AERadialGridDescriptor
-#from gpaw.atom.polarization import PolarizationOrbitalGenerator, Reference,\
-#     QuasiGaussian, default_rchar_rel, rchar_rels
 from gpaw.utilities import devnull, divrl
 from gpaw.basis_data import Basis, BasisFunction, parse_basis_name
 from gpaw.version import version
@@ -185,52 +183,6 @@ class BasisMaker:
         psi_g, e = self.generator.solve_confined(j, rcut, vconf)
         psit_g = self.smoothify(psi_g, l)
         return psit_g
-
-    #def make_split_valence_basis_function(self, psi_g, l, rcut):
-    #    gcut = self.generator.r2g(rcut)
-    #    return make_split_valence_basis_function(psi_g, l, gcut)
-
-    def make_polarization_function(self, rcut, l, referencefile=None, 
-                                   index=None, ngaussians=None, txt=devnull):
-        """Generate polarization function using the polarization module."""
-        symbol = self.generator.symbol
-        ref = Reference(symbol, referencefile, index)
-        gd, kpt_u, center = ref.get_reference_data()
-        symbols = ref.atoms.get_chemical_symbols()
-        symbols[ref.index] = '[%s]' % symbols[ref.index] # mark relevant atom
-
-        print >> txt, 'Reference system [ %s ]:' % ref.filename,
-        print >> txt, ' '.join(['%s' % sym for sym in symbols])
-        cell = ' x '.join(['%.02f' % a for a in ref.cell])
-        print >> txt, 'Cell = %s :: gpts = %s' % (cell, ref.gpts)
-        generator = PolarizationOrbitalGenerator(rcut, gaussians=ngaussians)
-        y = generator.generate(l, gd, kpt_u, center)
-        print >> txt, 'Quasi Gaussians: %d' % len(generator.alphas)
-        r_alphas = generator.r_alphas
-        print >> txt, 'Gaussian characteristic lengths evenly distributed'
-        print >> txt, 'Rchars from %.03f to %.03f' % (min(r_alphas),
-                                                      max(r_alphas))
-        print >> txt, 'k-points: %d' % len(kpt_u)
-        print >> txt, 'Reference states: %d' % len(kpt_u[0].psit_nG)
-        print >> txt, 'Quality: %.03f' % generator.quality
-
-        print >> txt, 'Coefficients:', ' '.join(['%5.2f' % f for f in y.coefs])
-
-        rowstrings = [' '.join(['%4.2f' % f for f in row])
-                      for row in generator.qualities]
-
-        # fancy formatting
-        rowcount, columncount = generator.qualities.shape
-        columnheader = list('|' * rowcount)
-        columnheader[rowcount // 2] = 'k'
-        print >> txt, ' ', ' m '.center(len(rowstrings[0]), '-')
-        for char, string in zip(columnheader, rowstrings):
-            print >>  txt, char, string
-
-        r = self.generator.r
-        psi = r**l * y(r)
-        return psi * r # Recall that wave functions are represented as psi*r
-
 
     def rcut_by_energy(self, j, esplit=.1, tolerance=.1, rguess=6.,
                        vconf_args=None):

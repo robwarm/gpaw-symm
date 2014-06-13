@@ -415,7 +415,7 @@ class PWWaveFunctions(FDPWWaveFunctions):
         
         # Build array of number of plane wave coefficiants for all k-points
         # in the IBZ:
-        self.ng_k = np.zeros(self.kd.nibzkpts)
+        self.ng_k = np.zeros(self.kd.nibzkpts, dtype=int)
         for kpt in self.kpt_u:
             if kpt.s == 0:
                 self.ng_k[kpt.k] = len(self.pd.Q_qG[kpt.q])
@@ -717,14 +717,8 @@ class PWWaveFunctions(FDPWWaveFunctions):
                 kpt.psit_nG[n] = self.pd.fft(psit_nR[n] * emikr_R, kpt.q)
 
     def random_wave_functions(self, mynao):
-        # rbw
-        # The standard initialisation once with rank make my debugging horrible.
-        # Instead reinitialise every time. Maybe not good fo production. But very 
-        # good for debugging.
-        # rbw
-        #rs = np.random.RandomState(self.world.rank)
+        rs = np.random.RandomState(self.world.rank)
         for kpt in self.kpt_u:
-            rs = np.random.RandomState(self.world.rank)
             psit_nG = kpt.psit_nG[mynao:]
             weight_G = 1.0 / (1.0 + self.pd.G2_qG[kpt.q])
             psit_nG.real = rs.uniform(-1, 1, psit_nG.shape) * weight_G
@@ -780,7 +774,7 @@ def ft(spline):
 
 
 class PWLFC(BaseLFC):
-    def __init__(self, spline_aj, pd, blocksize=None):
+    def __init__(self, spline_aj, pd, blocksize=5000):
         """Reciprocal-space plane-wave localized function collection.
 
         spline_aj: list of list of spline objects
@@ -913,7 +907,7 @@ class PWLFC(BaseLFC):
         c_xI = np.empty(a_xG.shape[:-1] + (self.nI,), self.pd.dtype)
         for a, I1, I2 in self.indices:
             c_xI[..., I1:I2] = c_axi[a] * self.eikR_qa[q][a].conj()
-        c_xI = c_xI.reshape((np.prod(c_xI.shape[:-1]), self.nI))
+        c_xI = c_xI.reshape((np.prod(c_xI.shape[:-1], dtype=int), self.nI))
 
         a_xG = a_xG.reshape((-1, a_xG.shape[-1])).view(self.pd.dtype)
         
@@ -933,7 +927,7 @@ class PWLFC(BaseLFC):
     def integrate(self, a_xG, c_axi=None, q=-1):
         c_xI = np.zeros(a_xG.shape[:-1] + (self.nI,), self.pd.dtype)
 
-        b_xI = c_xI.reshape((np.prod(c_xI.shape[:-1]), self.nI))
+        b_xI = c_xI.reshape((np.prod(c_xI.shape[:-1], dtype=int), self.nI))
         a_xG = a_xG.reshape((-1, a_xG.shape[-1]))
 
         alpha = 1.0 / self.pd.gd.N_c.prod()
@@ -964,7 +958,8 @@ class PWLFC(BaseLFC):
 
     def derivative(self, a_xG, c_axiv, q=-1):
         c_vxI = np.zeros((3,) + a_xG.shape[:-1] + (self.nI,), self.pd.dtype)
-        b_vxI = c_vxI.reshape((3, np.prod(c_vxI.shape[1:-1]), self.nI))
+        b_vxI = c_vxI.reshape((3, np.prod(c_vxI.shape[1:-1], dtype=int), 
+                               self.nI))
         a_xG = a_xG.reshape((-1, a_xG.shape[-1])).view(self.pd.dtype)
 
         alpha = 1.0 / self.pd.gd.N_c.prod()
@@ -1055,7 +1050,7 @@ class PWLFC(BaseLFC):
         
         c_xI = np.zeros(a_xG.shape[:-1] + (self.nI,), self.pd.dtype)
 
-        b_xI = c_xI.reshape((np.prod(c_xI.shape[:-1]), self.nI))
+        b_xI = c_xI.reshape((np.prod(c_xI.shape[:-1], dtype=int), self.nI))
         a_xG = a_xG.reshape((-1, a_xG.shape[-1]))
 
         alpha = 1.0 / self.pd.gd.N_c.prod()
@@ -1074,7 +1069,7 @@ class PWLFC(BaseLFC):
         return stress.real
 
 
-class PsudoCoreKineticEnergyDensityLFC(PWLFC):
+class PseudoCoreKineticEnergyDensityLFC(PWLFC):
     def add(self, tauct_R):
         tauct_R += self.pd.ifft(1.0 / self.pd.gd.dv * self.expand(-1).sum(0))
 
@@ -1142,8 +1137,7 @@ class ReciprocalSpaceDensity(Density):
                 spline_aj.append([setup.nct])
         self.nct = PWLFC(spline_aj, self.pd2)
 
-        self.ghat = PWLFC([setup.ghat_l for setup in setups], self.pd3,
-                          blocksize=10000)
+        self.ghat = PWLFC([setup.ghat_l for setup in setups], self.pd3)
 
     def set_positions(self, spos_ac, rank_a=None):
         Density.set_positions(self, spos_ac, rank_a)
@@ -1184,7 +1178,7 @@ class ReciprocalSpaceDensity(Density):
         self.rhot_q[0] = 0.0
 
     def get_pseudo_core_kinetic_energy_density_lfc(self):
-        return PsudoCoreKineticEnergyDensityLFC(
+        return PseudoCoreKineticEnergyDensityLFC(
             [[setup.tauct] for setup in self.setups], self.pd2)
 
     def calculate_dipole_moment(self):

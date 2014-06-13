@@ -154,7 +154,7 @@ class Hamiltonian:
             bb = (nl[1])*len(l_j)-((nl[1]-1)*(nl[1])/2)
             ab = aa+nl[1]-nl[0]
             
-            if(scale==0 or scale=='False' or scale =='false'):
+            if not scale:
                 lq_a  = lq[aa]
                 lq_ab = lq[ab]
                 lq_b  = lq[bb]
@@ -247,11 +247,12 @@ class Hamiltonian:
                 
                 l_j = setup.l_j
                 l   = setup.Hubl
+                scale = setup.Hubs
                 nl  = np.where(np.equal(l_j,l))[0]
                 nn  = (2*np.array(l_j)+1)[0:nl[0]].sum()
                 
                 for D_p, H_p in zip(D_sp, self.dH_asp[a]):
-                    [N_mm,V] =self.aoom(unpack2(D_p),a,l)
+                    [N_mm,V] =self.aoom(unpack2(D_p),a,l, scale)
                     N_mm = N_mm / 2 * nspins
                      
                     Eorb = setup.HubU / 2. * (N_mm - np.dot(N_mm,N_mm)).trace()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import numpy as np
 from ase.structure import molecule
 from ase.constraints import FixedPlane

@@ -29,7 +29,7 @@ If you decide to install a development version of GPAW, this is what you do:
 
    **Note** that this path appears in few places in the tools described on
    this page - make sure you change those occurences if installing
-   in under a different directory.
+   in under a different directory. The instructions assume **bash**.
 
 1. On the ``servcamd`` filesystem (login on your workstation)
    go to a directory on the Niflheim filesystem.
@@ -42,7 +42,7 @@ If you decide to install a development version of GPAW, this is what you do:
 
 3. Set the :envvar:`GPAW_HOME` environment variable::
 
-     export GPAW_HOME=/home/niflheim/$USER/devel/gpaw
+     export GPAW_HOME=${HOME}/devel/gpaw
 
 4. To compile the GPAW C-code, run the shell script
    :svn:`~doc/install/Linux/Niflheim/compile.sh` 
@@ -73,18 +73,21 @@ If you decide to install a development version of GPAW, this is what you do:
 	    export GPAW_PLATFORM="linux-x86_64-`echo $FYS_PLATFORM | sed 's/-el6//'`-2.6"
 	fi
 	# GPAW_HOME must be set after loading the GPAW module!
-	export GPAW_HOME=/home/niflheim/$USER/devel/gpaw
+	export GPAW_HOME=${HOME}/devel/gpaw
 	export PATH=${GPAW_HOME}/build/bin.${GPAW_PLATFORM}:${PATH}
 	export PATH=${GPAW_HOME}/tools:${PATH}
 	export PYTHONPATH=${GPAW_HOME}:${PYTHONPATH}
 	export PYTHONPATH=${GPAW_HOME}/build/lib.${GPAW_PLATFORM}:${PYTHONPATH}
 
-    Make sure that you add these settings above any line that
-    causes exit when run in the batch system e.g. ``if ( { tty -s } == 0 ) exit``.
+	if test -n "`echo $FYS_PLATFORM | grep el6`"; then
+	# http://docs.python.org/2/using/cmdline.html#envvar-PYTHONDONTWRITEBYTECODE
+	    export PYTHONDONTWRITEBYTECODE=1  # disable creation of pyc files
+	    module load NUMPY/1.7.1-1
+	    module load SCIPY/0.12.0-1
+	fi
 
     **Warning**: from the moment you save settings in
-    :file:`/home/niflheim/$USER/.cshrc`
-    or :file:`/home/niflheim/$USER/.bashrc`, your new jobs
+    :file:`/home/niflheim/$USER/.bashrc`, your new jobs
     (also those already waiting in the queue)
     will start using the new version.
     The jobs already running are not affected.
@@ -113,7 +116,7 @@ If you decide to install a development version of GPAW, this is what you do:
 	    export GPAW_PLATFORM="linux-x86_64-`echo $FYS_PLATFORM | sed 's/-el6//'`-2.6"
 	fi
 	# GPAW_HOME must be set after loading the GPAW module!
-	export GPAW_HOME=/home/niflheim/$USER/devel/gpaw
+	export GPAW_HOME=${HOME}/devel/gpaw
 	export PATH=${GPAW_HOME}/build/bin.${GPAW_PLATFORM}:${PATH}
 	export PATH=${GPAW_HOME}/tools:${PATH}
 	export PYTHONPATH=${GPAW_HOME}:${PYTHONPATH}
@@ -136,7 +139,7 @@ If you decide to install a development version of GPAW, this is what you do:
 	 {
 	 name="$1"
 	 shift
-	 qsub $@ -v name=$name /home/niflheim/$USER/devel/gpaw/qsub.sh
+	 qsub $@ -v name=$name ${HOME}/devel/gpaw/qsub.sh
 	 }
 
     When submitting jobs specify the python script first!::

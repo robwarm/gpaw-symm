@@ -166,7 +166,7 @@ class PAW(PAWTextOutput):
             
             if key in ['fixmom', 'mixer',
                        'verbose', 'txt', 'hund', 'random',
-                       'eigensolver', 'idiotproof', 'notify', 'lft']:
+                       'eigensolver', 'idiotproof', 'notify']:
                 continue
 
             if key in ['convergence', 'fixdensity', 'maxiter']:
@@ -259,26 +259,11 @@ class PAW(PAWTextOutput):
             self.print_cell_and_parameters()
 
         self.timer.start('SCF-cycle')
-               
-        i = 0
-        print self.wfs.kd.ibzk_kc
-        #print i
-        print self.hamiltonian.Ekin, self.hamiltonian.Ekin0, self.hamiltonian.Epot, self.hamiltonian.Exc, self.hamiltonian.Eext
-        #print self.occupations
         for iter in self.scf.run(self.wfs, self.hamiltonian, self.density,
                                  self.occupations):
             self.iter = iter
             self.call_observers(iter)
             self.print_iteration(iter)
-            
-            #if i == 1:
-                # check stuff
-                #print self.density.rhot_g
-                #exit()
-            i += 1
-           # print i
-            print self.hamiltonian.Ekin, self.hamiltonian.Ekin0, self.hamiltonian.Epot, self.hamiltonian.Exc, self.hamiltonian.Eext
-            #exit()
         self.timer.stop('SCF-cycle')
 
         if self.scf.converged:
@@ -336,9 +321,6 @@ class PAW(PAWTextOutput):
 
         par = self.input_parameters
 
-        # for testing
-        #par.lft = True
-
         world = par.communicator
         if world is None:
             world = mpi.world
@@ -379,9 +361,6 @@ class PAW(PAWTextOutput):
 
         if mode == 'pw':
             mode = PW()
-
-        if mode == 'fd':
-            par.lft = False
 
         if par.realspace is None:
             realspace = not isinstance(mode, PW)
@@ -442,7 +421,7 @@ class PAW(PAWTextOutput):
 
         # K-point descriptor
         bzkpts_kc = kpts2ndarray(par.kpts, self.atoms)
-        kd = KPointDescriptor(bzkpts_kc, nspins, collinear, par.lft)
+        kd = KPointDescriptor(bzkpts_kc, nspins, collinear)
 
         width = par.width
         if width is None:
@@ -461,8 +440,8 @@ class PAW(PAWTextOutput):
             else:
                 dtype = complex
 
-        N_c = kd.set_symmetry(atoms, setups, magmom_av, par.usesymm, N_c, world)
-        
+        kd.set_symmetry(atoms, setups, magmom_av, par.usesymm, N_c, world)
+
         nao = setups.nao
         nvalence = setups.nvalence - par.charge
         M_v = magmom_av.sum(0)
@@ -956,13 +935,13 @@ def kpts2sizeandoffsets(size=None, density=None, gamma=None, even=None,
     
     
 def kpts2ndarray(kpts, atoms=None):
-    """Convert kpts keyword to 2d ndarray of scaled k-points."""
+    """Convert kpts keyword to 2-d ndarray of scaled k-points."""
     
     if kpts is None:
         return np.zeros((1, 3))
         
     if isinstance(kpts, dict):
-        size, offsets = kpts2sizeandoffsets(atoms, **kpts)
+        size, offsets = kpts2sizeandoffsets(atoms=atoms, **kpts)
         return monkhorst_pack(size) + offsets
         
     if isinstance(kpts[0], int):
@@ -976,14 +955,15 @@ Did not converge!
 
 Here are some tips:
 
-1) Make sure the geometry is physically sound.
-2) Don't do spin-paired calculations with an odd number of electrons.
-3) Use less aggressive density mixing.
-4) Solve the eigenvalue problem more accurately at each scf-step.
-5) Use a smoother distribution function for the occupation numbers.
-6) Try adding more empty states.
-7) Use enough k-points.
-8) Don't let your structure optimization algorithm take too large steps.
+1) Make sure the geometry and spin-state is physically sound.
+2) Use less aggressive density mixing.
+3) Solve the eigenvalue problem more accurately at each scf-step.
+4) Use a smoother distribution function for the occupation numbers.
+5) Try adding more empty states.
+6) Use enough k-points.
+7) Don't let your structure optimization algorithm take too large steps.
+8) Solve the Poisson equation more accurately.
+9) Better initial guess for the wave functions.
 
 See details here:
     

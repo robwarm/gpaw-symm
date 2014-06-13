@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from gpaw import *
 from ase import *
 import numpy as np
@@ -18,11 +20,11 @@ atom = Atoms(symbols='KTaO3',
                                 ),
             )
 
+
 calc = GPAW(h=0.16,
             kpts=(10,10,10),
             xc='GLLBSC',
             txt='KTaO3.out',
-            eigensolver='cg',
             occupations=FermiDirac(width=0.05),
             )
 
@@ -40,4 +42,4 @@ EKs, Dxc = response.calculate_delta_xc_perturbation()
 # Dxc = derivative discontinuity
 Gap = EKs+Dxc
 
-print "Calculated band gap:", Gap
+print("Calculated band gap:", Gap)

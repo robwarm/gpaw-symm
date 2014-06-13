@@ -8,7 +8,7 @@ from gpaw.test import equal
 ##endings = ['nc']
 endings = ['gpw']
 try:
-    import _hdf5
+    import _gpaw_hdf5
     endings.append('hdf5')
 except ImportError:
     pass

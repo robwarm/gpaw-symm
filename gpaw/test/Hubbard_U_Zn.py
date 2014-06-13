@@ -21,7 +21,7 @@ for spin in [0, 1]:
              )
     s.set_calculator(c)
     E[spin] = s.get_potential_energy()
-    c.set(setups='paw:d,3.0')
+    c.set(setups=':d,3.0,1')
     E_U[spin] = s.get_potential_energy()
 
 print "E=", E

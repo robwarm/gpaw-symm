@@ -6,14 +6,13 @@ from gpaw.mpi import world
 a = molecule('H', pbc=1)
 a.center(vacuum=2)
 
-comm = world.new_communicator([0])
+comm = world.new_communicator([world.rank])
 e0 = 0.0
-if world.rank == 0:
-    a.calc = GPAW(mode=PW(250),
-                  communicator=comm,
-                  txt=None)
-    e0 = a.get_potential_energy()
-e0 = world.sum(e0)
+a.calc = GPAW(mode=PW(250),
+              communicator=comm,
+              txt=None)
+e0 = a.get_potential_energy()
+e0 = world.sum(e0) / world.size
 
 a.calc = GPAW(mode=PW(250),
               eigensolver='rmm-diis',

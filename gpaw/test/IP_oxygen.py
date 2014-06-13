@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from ase import Atom, Atoms
 from gpaw import GPAW
 from gpaw.test import equal

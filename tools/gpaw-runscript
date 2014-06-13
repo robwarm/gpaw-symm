@@ -421,6 +421,8 @@ unset CC CFLAGS LDFLAGS
         if queue:
             print >> f, '#$ -q', queue
         print >> f, '#$ -l h_rt=' + hms_string(set['time'])
+        if set['mail'] is not None:
+            print >> f, '#$ -M',set['mail']
         print >> f
         print >> f, 'cd', set['wd']
         print >> f
@@ -460,12 +462,12 @@ ormance.'
         print >> f, '#MSUB -l walltime=' + hms_string(set['time'])
         print >> f, '#MSUB -m bea'
         if set['mail'] is not None:
-            print >> f, '#MSUB -M',set['mail']
+            print >> f, '#MSUB -M', set['mail']
 #        print >> f, 'export PATH=/usr/lib/openmpi/1.2.5-gcc/bin:$PATH'
         print >> f, 'cd', set['wd']
-        print >> f, 'export PYTHONPATH=$PYTHONPATH:' + env['PYTHONPATH']
-        print >> f, 'export GPAW_SETUP_PATH='+env['GPAW_SETUP_PATH']
-        print >> f, 'export GPAW_PYTHON='+env['GPAW_PYTHON']
+        print >> f, 'export PYTHONPATH=' + env['PYTHONPATH'] + ':$PYTHONPATH'
+        print >> f, 'export GPAW_SETUP_PATH=' + env['GPAW_SETUP_PATH']
+        print >> f, 'export GPAW_PYTHON=' + env['GPAW_PYTHON']
         print >> f, 'export PSP_ONDEMAND=1'
         print >> f, 'mpiexec -np', cores, '-x', 
         print >> f, '$GPAW_PYTHON', set['script'],
@@ -658,7 +660,7 @@ else:
         set['arch'] = platforms[sys.platform]
         print 'platform', sys.platform, 'found,',
     else:
-        print "Host " + str(host) + " unknown, try -q option."
+        print "Host " + str(host) + " unknown, try -a option."
         list_systems(RunScript)
         sys.exit()
 

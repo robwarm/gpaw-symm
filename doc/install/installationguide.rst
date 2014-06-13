@@ -132,6 +132,28 @@ and install GPAW with:
 For the full list of supported distributions check
 https://build.opensuse.org/package/show?package=gpaw&project=home%3Adtufys
 
+Windows
+-------
+
+.. note::
+
+   GPAW is not yet fully functional on Windows! See
+   http://listserv.fysik.dtu.dk/pipermail/gpaw-users/2013-August/002264.html
+
+On Windows install ASE and dependencies as described at
+https://wiki.fysik.dtu.dk/ase/download.html#windows.
+
+Download the gpaw.win32-py2.7.msi_ installer and install with::
+
+   gpaw.win32-py2.7.msi /l*vx "%TMP%\gpaw_install.log" /passive
+
+.. _gpaw.win32-py2.7.msi:
+       https://wiki.fysik.dtu.dk/gpaw-files/gpaw.win32-py2.7.msi
+
+.. note::
+
+    Unpack gpaw-setups under C:\gpaw-setups.
+
 .. _installationguide_developer:
 
 Developer installation

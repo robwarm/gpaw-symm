@@ -13,6 +13,7 @@ def energy(usesymm):
     atoms.set_calculator(GPAW(h=0.3,
                               occupations=FermiDirac(width=0.1),
                               usesymm=usesymm,
+                              convergence=dict(energy=1e-6),
                               kpts=(3,1,1),
                               mode='lcao'))
     return atoms.get_potential_energy()

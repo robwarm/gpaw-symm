@@ -61,12 +61,10 @@ can be calculated with the script :svn:`~doc/tutorials/all-electron/NaCl.py`:
 The result for the integrated pseudo- and all-electron densities of
 the three systems is:
 
-==== ==== =====
-\    ñ    n
-Na   1.71 11.00
-Cl   7.50 17.00
-NaCl 9.18 28.00
-==== ==== =====
+.. csv-table::
+  :file: all_electron.csv
+  :header: formula, ñ, n
+
 
 From which we see that the all-electron densities integrate to the
 total number of electrons in the system, as expected.

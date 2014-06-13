@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from ase.io import read
 from gpaw import GPAW
 from gpaw import dscf

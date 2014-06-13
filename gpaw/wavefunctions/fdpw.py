@@ -62,7 +62,7 @@ class FDPWWaveFunctions(WaveFunctions):
             # will make it necessary to do this for some reason.
             density.calculate_normalized_charges_and_mix()
         hamiltonian.update(density)
-
+                
         if self.kpt_u[0].psit_nG is None:
             self.initialize_wave_functions_from_basis_functions(
                 basis_functions, density, hamiltonian, spos_ac)
@@ -73,7 +73,7 @@ class FDPWWaveFunctions(WaveFunctions):
                                                        spos_ac):
         if self.initksl is None:
             raise RuntimeError('use fewer bands or more basis functions')
-
+            
         self.timer.start('LCAO initialization')
         lcaoksl, lcaobd = self.initksl, self.initksl.bd
         lcaowfs = LCAOWaveFunctions(lcaoksl, self.gd, self.nvalence,

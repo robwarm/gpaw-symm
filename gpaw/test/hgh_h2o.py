@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Test of HGH pseudopotential implementation.
 
 This is the canonical makes-sure-nothing-breaks test, which checks that the

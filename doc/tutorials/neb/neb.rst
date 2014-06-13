@@ -18,6 +18,6 @@ then each of the three internal images will be parallelized over 4 cpu's.
 
 The results are read with::
 
-  $ ase-gui neb_?.traj
+  $ ase-gui -n -1 neb?.traj
 
-The energy barrier is found to be 0.29 eV.
+The energy barrier is found to be ~0.14 eV.

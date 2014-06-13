@@ -24,6 +24,7 @@ from gpaw.xc import XC
 from gpaw.xc.hybridk import HybridXC
 from gpaw.utilities.timing import Timer, nulltimer
 from gpaw.lrtddft.spectrum import spectrum
+from gpaw.wavefunctions.fd import FDWaveFunctions
 
 __all__ = ['LrTDDFT', 'photoabsorption_spectrum', 'spectrum']
 
@@ -81,6 +82,8 @@ class LrTDDFT(ExcitationList):
             self.eh_comm = mpi.world.new_communicator(np.asarray(eh_comm))
  
         if calculator is not None and calculator.initialized:
+            if not isinstance(calculator.wfs, FDWaveFunctions):
+                raise RuntimeError('Linear response TDDFT supported only in real space mode')
             if calculator.wfs.kpt_comm.size > 1:
                 err_txt = "Spin parallelization with Linear response "
                 err_txt += "TDDFT. Use parallel = {'domain' : 'domain_only'} "

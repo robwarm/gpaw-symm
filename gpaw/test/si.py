@@ -26,23 +26,14 @@ e1 = bulk.get_potential_energy()
 niter1 = calc.get_number_of_iterations()
 eigs = calc.get_eigenvalues(kpt=0)
 calc.write('temp.gpw')
-del bulk
-del calc
 
 bulk, calc = restart('temp.gpw', fixdensity=True)
-#calc.scf.reset()
 e2 = bulk.get_potential_energy()
-try: # number of iterations needed in restart
-    niter2 = calc.get_number_of_iterations()
-except: pass
 eigs2 = calc.get_eigenvalues(kpt=0)
 print 'Orginal', eigs
 print 'Fixdensity', eigs2
 print 'Difference', eigs2-eigs
 
 assert np.fabs(eigs2 - eigs)[:-1].max() < 3e-5
-
-energy_tolerance = 0.0006
-niter_tolerance = 0
-equal(e1, -36.7664, energy_tolerance)
-equal(e2, -36.7664, energy_tolerance)
+equal(e1, -36.7667, 0.001)
+equal(e1, e2, 1e-10)

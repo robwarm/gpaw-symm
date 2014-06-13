@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """Module for making tests on small molecules in GPAW.
 
 One molecule test to rule them all

@@ -672,9 +672,9 @@ static PyMethodDef functions[] = {
   {0, 0, 0, 0}
 };
 
-PyMODINIT_FUNC init_hdf5(void) 
+PyMODINIT_FUNC init_gpaw_hdf5(void) 
 { 
-  PyObject *m = Py_InitModule("_hdf5",functions); 
+  PyObject *m = Py_InitModule("_gpaw_hdf5",functions); 
   // Set some hdf5 constants as attributes
   PyModule_AddIntConstant(m, "H5T_FLOAT", H5T_FLOAT);
   PyModule_AddIntConstant(m, "H5T_INTEGER", H5T_INTEGER);

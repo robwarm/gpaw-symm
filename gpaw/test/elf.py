@@ -43,13 +43,13 @@ if rank == 0:
     z0 = atoms.positions[1][2]/atoms.get_cell()[2,2]
     z1 = atoms.positions[0][2]/atoms.get_cell()[2,2]
     gd = calc.wfs.gd
-    Gx0, Gx1 = gd.N_c[0]*x0, gd.N_c[0] * x1
-    Gy0, Gy1 = gd.N_c[1]*y0, gd.N_c[1] * y1
-    Gz0, Gz1 = gd.N_c[2]*z0, gd.N_c[2] * z1
+    Gx0, Gx1 = int(gd.N_c[0]*x0), int(gd.N_c[0] * x1)
+    Gy0, Gy1 = int(gd.N_c[1]*y0), int(gd.N_c[1] * y1)
+    Gz0, Gz1 = int(gd.N_c[2]*z0), int(gd.N_c[2] * z1)
     finegd = calc.density.finegd
-    gx0, gx1 = finegd.N_c[0]*x0, finegd.N_c[0] * x1
-    gy0, gy1 = finegd.N_c[1]*y0, finegd.N_c[1] * y1
-    gz0, gz1 = finegd.N_c[2]*z0, finegd.N_c[2] * z1
+    gx0, gx1 = int(finegd.N_c[0]*x0), int(finegd.N_c[0] * x1)
+    gy0, gy1 = int(finegd.N_c[1]*y0), int(finegd.N_c[1] * y1)
+    gz0, gz1 = int(finegd.N_c[2]*z0), int(finegd.N_c[2] * z1)
     int1 = elf_G[Gx0:Gx1,Gy0:Gy1,Gz0:Gz1].sum() * gd.dv
     int2 = elf_g[gx0:gx1,gy0:gy1,gz0:gz1].sum() * finegd.dv
     parprint("Ints", int1, int2)

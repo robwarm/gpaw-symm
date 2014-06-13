@@ -13,7 +13,7 @@ from math import pi
 class OccupationNumbers:
     """Base class for all occupation number objects."""
     def __init__(self, fixmagmom):
-        self.fixmagmom = fixmagmom        
+        self.fixmagmom = fixmagmom
         self.magmom = None      # magnetic moment
         self.e_entropy = None   # -ST
         self.e_band = None      # band energy (sum_n eps_n * f_n)
@@ -112,7 +112,7 @@ class OccupationNumbers:
                 self.split = fermilevels[0] - fermilevels[1]
             else:
                 warnings.warn('Please use set_fermi_levels when ' +
-                        'using fixmagmom', DeprecationWarning)
+                              'using fixmagmom', DeprecationWarning)
                 self.fermilevel = fermilevel
         else:
             self.fermilevel = fermilevel
@@ -126,7 +126,7 @@ class OccupationNumbers:
         
         """
         if self.fixmagmom:
-            fermilevels = np.array(fermilevel)
+            fermilevels = np.array(fermilevels)
             if fermilevels.size == 2:
                 self.fermilevel = fermilevels.mean()
                 self.split = fermilevels[0] - fermilevels[1]
@@ -134,7 +134,7 @@ class OccupationNumbers:
                 raise ValueError('Please supply two distinct values.')
         else:
             raise ValueError('Different fermi levels are only vaild with ' +
-                                'fixmagmom!')
+                             'fixmagmom!')
             
     def set_fermi_levels_mean(self, fermilevel):
         """This method sets the mean of two fermi level.
@@ -149,10 +149,10 @@ class OccupationNumbers:
                 self.fermilevel = fermilevel
             else:
                 raise ValueError('Please use float for supplying mean ' +
-                                    'fermi level!')
+                                 'fermi level!')
         else:
             raise ValueError('Different fermi levels are only vaild with ' +
-                                'fixmagmom!')
+                             'fixmagmom!')
             
     def set_fermi_splitting(self, fermisplit):
         """Set the splitting of the fermi-level (in Ht).
@@ -287,7 +287,7 @@ class ZeroKelvin(OccupationNumbers):
                 f_n = wfs.bd.empty(global_array=True)
                 sign = 1 - kpt.s * 2
                 ne = 0.5 * (self.nvalence + sign * self.magmom)
-                homo, lumo = occupy(f_n, eps_n, ne) 
+                homo, lumo = occupy(f_n, eps_n, ne)
                 fermilevels[kpt.s] = 0.5 * (homo + lumo)
             wfs.bd.distribute(f_n, kpt.f_n)
         wfs.bd.comm.sum(fermilevels)
@@ -394,9 +394,17 @@ class SmoothDistribution(ZeroKelvin):
             self.fermilevel = self.guess_fermi_level(wfs)
 
         if not self.fixmagmom or wfs.nspins == 1:
-            self.fermilevel, self.magmom, self.e_entropy = \
-                             self.find_fermi_level(wfs, self.nvalence,
-                                                   self.fermilevel)
+            try:
+                result = self.find_fermi_level(wfs, self.nvalence,
+                                               self.fermilevel)
+            except RuntimeError:
+                self.fermilevel = self.guess_fermi_level(wfs)
+                result = self.find_fermi_level(wfs, self.nvalence,
+                                               self.fermilevel)
+                self.niter += self.maxiter
+                
+            self.fermilevel, self.magmom, self.e_entropy = result
+            
             if wfs.nspins == 1:
                 self.magmom = 0.0
         else:
@@ -407,7 +415,7 @@ class SmoothDistribution(ZeroKelvin):
                 ne = 0.5 * (self.nvalence + sign * self.magmom)
                 fermilevel = self.fermilevel + 0.5 * sign * self.split
                 fermilevels[s], magmom, e_entropy = \
-                                self.find_fermi_level(wfs, ne, fermilevel, [s])
+                    self.find_fermi_level(wfs, ne, fermilevel, [s])
                 self.e_entropy += e_entropy
             self.fermilevel = fermilevels.mean()
             self.split = fermilevels[0] - fermilevels[1]
@@ -425,15 +433,17 @@ class SmoothDistribution(ZeroKelvin):
             epsilon = 1e-2
             for kpt in wfs.kpt_u:
                 if kpt.s == spin:
-                    eps = np.max(np.where(kpt.f_n/kpt.weight>epsilon, kpt.eps_n, -1000.0))
+                    eps = np.max(np.where(kpt.f_n / kpt.weight > epsilon,
+                                          kpt.eps_n, -1000.0))
                     eps_homo = max([eps_homo, eps])
-                    eps = np.min(np.where(kpt.f_n/kpt.weight<=epsilon, kpt.eps_n, +1000.0))
+                    eps = np.min(np.where(kpt.f_n / kpt.weight <= epsilon,
+                                          kpt.eps_n, +1000.0))
                     eps_lumo = min([eps_lumo, eps])
             
             eps_homo = wfs.kd.comm.max(eps_homo)
             eps_lumo = wfs.kd.comm.min(eps_lumo)
 
-            return np.array( [eps_homo, eps_lumo] )
+            return np.array([eps_homo, eps_lumo])
 
     def get_homo_lumo(self, wfs):
         if self.width == 0:
@@ -534,6 +544,7 @@ class FermiDirac(SmoothDistribution):
         sign = 1 - kpt.s * 2
         return np.array([n, dnde, n * sign, e_entropy])
 
+        
 class MethfesselPaxton(SmoothDistribution):
     def __init__(self, width, iter=0, fixmagmom=False, maxiter=1000):
         SmoothDistribution.__init__(self, width, fixmagmom, maxiter)
@@ -549,11 +560,11 @@ class MethfesselPaxton(SmoothDistribution):
         kpt.f_n[:] = kpt.weight * z
         n = kpt.f_n.sum()
 
-        dnde = kpt.weight / np.sqrt(pi) * np.exp(-x**2)
+        dnde = 1 / np.sqrt(pi) * np.exp(-x**2)
         for i in range(self.iter):
             dnde += self.coff_function(i + 1) * self.hermite_poly(2 * i + 2, x) * np.exp(-x**2)
         dnde = dnde.sum()
-        dnde /= self.width
+        dnde *= kpt.weight / self.width
         e_entropy = 0.5 * self.coff_function(self.iter) * self.hermite_poly(2 * self.iter, x)* np.exp(-x**2)
         e_entropy = kpt.weight * e_entropy.sum() * self.width
 
@@ -572,6 +583,7 @@ class MethfesselPaxton(SmoothDistribution):
             return 2 * x * self.hermite_poly(n - 1, x) \
                             - 2 * (n - 1) * self.hermite_poly(n - 2, x)
 
+                            
 class FixedOccupations(ZeroKelvin):
     def __init__(self, occupation):
         self.occupation = np.array(occupation)

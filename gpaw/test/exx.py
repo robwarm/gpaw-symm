@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import os
 from ase import Atom, Atoms
 from gpaw import GPAW, PoissonSolver

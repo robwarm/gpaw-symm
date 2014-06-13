@@ -22,8 +22,8 @@ Introductory tutorials
 .. toctree::
    :maxdepth: 2
 
-   atomization/atomization
-   optimization/optimization
+   H2/atomization
+   H2/optimization
    plotting/plot_wave_functions
    bandstructures/bandstructures
    lattice_constants/lattice_constants
@@ -37,6 +37,7 @@ Specialized tutorials
 
    band_gap/band_gap
    dipole_correction/dipole
+   hubbardu/hubbardu
    jellium/jellium
    hydrogen/h
    stm/stm
@@ -47,7 +48,7 @@ Specialized tutorials
    negfstm/negfstm
    dielectric_response/dielectric_response
    rpa/rpa_tut
-   ensembles/ensembles
+   H2/ensembles
    gw_tutorial/gw_tutorial
    atomization_cmr/atomization_cmr
 

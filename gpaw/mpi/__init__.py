@@ -654,8 +654,10 @@ def distribute_cpus(parsize_domain, parsize_bands,
 def compare_atoms(atoms, comm=world):
     """Check whether atoms objects are identical on all processors."""
     # Construct fingerprint:
+    # ASE may return slightly different atomic positions (e.g. due
+    # to MKL) so compare only first 8 decimals of positions
     fingerprint = np.array([md5_array(array, numeric=True) for array in
-                             [atoms.positions,
+                             [atoms.positions.round(8),
                               atoms.cell,
                               atoms.pbc * 1.0,
                               atoms.get_initial_magnetic_moments()]])
@@ -679,6 +681,8 @@ def compare_atoms(atoms, comm=world):
             itemdata.dump('%s_r%04d_%s.pickle' % (dumpfile, comm.rank, 
                                                   itemname))
 
+    # Use only the atomic positions from rank 0
+    comm.broadcast(atoms.positions, 0)
     return not mismatches.any()
 
 def broadcast(obj, root=0, comm=world):

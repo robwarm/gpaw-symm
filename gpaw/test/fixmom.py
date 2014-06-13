@@ -1,6 +1,6 @@
 from ase import Atoms
 from gpaw import GPAW, FermiDirac
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import MixerSum
 from gpaw.test import equal
 

@@ -63,7 +63,8 @@ class HirshfeldDensity(RealSpaceDensity):
                 D_asp[len(atoms)] = all_D_asp.get(a)
             atoms.append(all_atoms[a])
             rank_a.append(all_rank_a[a])
-        atoms = Atoms(atoms, cell=all_atoms.get_cell())
+        atoms = Atoms(atoms, 
+                      cell=all_atoms.get_cell(), pbc=all_atoms.get_pbc())
         spos_ac = atoms.get_scaled_positions()
         Z_a = atoms.get_atomic_numbers()
 

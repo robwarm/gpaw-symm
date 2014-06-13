@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import os
 import gc
 import platform
@@ -11,11 +10,19 @@ from optparse import OptionParser
 import gpaw.mpi as mpi
 from gpaw.hooks import hooks
 from gpaw import debug
+from gpaw.version import version
 
 
 def run():
-    parser = OptionParser(usage='%prog [options] [tests]',
-                          version='%prog 0.1')
+    description = ('Run the GPAW test suite.  The test suite can be run in '
+                   'parallel with MPI through gpaw-python.  The test suite '
+                   'supports 1, 2, 4 or 8 CPUs although some tests are '
+                   'skipped for some parallelizations.  If no TESTs are '
+                   'given, run all tests supporting the parallelization.')
+
+    parser = OptionParser(usage='%prog [OPTION...] [TEST...]',
+                          description=description,
+                          version='%%prog %s' % version)
     parser.add_option('-x', '--exclude',
                       type='string', default=None,
                       help='Exclude tests (comma separated list of tests).',
@@ -29,11 +36,13 @@ def run():
                       help='Run remaining tests, starting after TESTFILE')
     parser.add_option('--range',
                       type='string', default=None,
-                      help='Run tests in range test_i.py to test_j.py ' +
+                      help='Run tests in range test_i.py to test_j.py '
                       '(inclusive)',
                       metavar='test_i.py,test_j.py')
     parser.add_option('-j', '--jobs', type='int', default=1,
-                      help='Run JOBS threads.')
+                      help='Run JOBS threads.  Each test will be executed '
+                      'in serial by one thread.  This option cannot be used '
+                      'for parallelization together with MPI.')
     parser.add_option('--reverse', action='store_true',
                       help=('Run tests in reverse order (less overhead with '
                             'multiple jobs)'))

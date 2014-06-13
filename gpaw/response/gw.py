@@ -37,6 +37,7 @@ class GW(BASECHI):
                  hilbert_trans=False,
                  wpar=1,
                  vcut=None,
+                 numint=False,
                  txt=None
                 ):
 
@@ -52,6 +53,7 @@ class GW(BASECHI):
         self.hilbert_trans = hilbert_trans
         self.wpar = wpar
         self.vcut = vcut
+        self.numint = numint
         self.gwtxtname = txt
 
 
@@ -341,7 +343,7 @@ class GW(BASECHI):
                                     integrate_gamma=True,
                                     N_k=self.kd.N_c,
                                     vcut=self.vcut))**0.5
-        if self.vcut == '2D' and df.optical_limit:
+        if (self.vcut == '2D' and df.optical_limit) or self.numint:
             for iG in range(len(df.Gvec_Gc)):
                 if df.Gvec_Gc[iG, 0] == 0 and df.Gvec_Gc[iG, 1] == 0:
                     v_q, v0_q = calculate_Kc_q(self.acell_cv,

@@ -1,12 +1,12 @@
 from gpaw import GPAW, ConvergenceError, restart
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import MixerSum
 from gpaw.test import equal
 from ase.lattice import bulk
 
 modes = ['gpw']
 try:
-    import _hdf5
+    import _gpaw_hdf5
     modes.append('hdf5')
 except ImportError:
     pass

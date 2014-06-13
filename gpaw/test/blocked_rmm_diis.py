@@ -1,7 +1,6 @@
 import numpy as np
 from ase import Atom, Atoms
-from gpaw import GPAW, Mixer
-from gpaw.eigensolvers import RMM_DIIS_new as RMM_DIIS
+from gpaw import GPAW, Mixer, RMM_DIIS
 from gpaw.test import equal
 
 a = 4.0

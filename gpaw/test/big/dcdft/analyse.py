@@ -95,7 +95,7 @@ for n in task.collection.names:
 
 if 1:
     # download and create the project databases
-    src = 'http://molmod.ugent.be/sites/default/files/Delta_v2-0.zip'
+    src = 'https://molmod.ugent.be/sites/default/files/Delta_v3-0_0.zip'
     name = os.path.basename(src)
     dir = 'Delta'
     if not os.path.exists(dir): os.makedirs(dir)

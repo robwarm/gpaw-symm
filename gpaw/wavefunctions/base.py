@@ -105,11 +105,10 @@ class WaveFunctions(EmptyWaveFunctions):
             self.add_to_density_from_k_point(nt_sG, kpt)
         self.band_comm.sum(nt_sG)
         self.kpt_comm.sum(nt_sG)
-        #print 'before symmetrize'
-        #print nt_sG[0][0][0]
+        
         self.timer.start('Symmetrize density')
         for nt_G in nt_sG:
-            self.symmetry.symmetrize_ft_no(nt_G, self.gd)
+            self.symmetry.symmetrize(nt_G, self.gd)
         self.timer.stop('Symmetrize density')
 
     def add_to_density_from_k_point(self, nt_sG, kpt):

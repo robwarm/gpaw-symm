@@ -7,8 +7,8 @@ from gpaw.atom.basis import BasisMaker
 from gpaw.mpi import world
 from gpaw.test import equal
 
+basis = BasisMaker('H', 'sz').generate(1, 0)
 if world.rank == 0:
-    basis = BasisMaker('H', 'sz').generate(1, 0)
     basis.write_xml()
 world.barrier()
 if setup_paths[0] != '.':

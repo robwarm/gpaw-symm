@@ -67,8 +67,11 @@ more about :ref:`its features and the algorithms used
 News
 ====
 
+* :ref:`GPAW version 0.10 <releasenotes>` released (Apr 8 2014)
+
 * GPAW is part of the `PRACE Unified European Application Benchmark Suite`_
   (October 17 2013)
+
 * May 21-23, 2013: :ref:`GPAW workshop <workshop>` at the Technical
   University of Denmark (Feb 8 2013)
 

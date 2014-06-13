@@ -41,40 +41,6 @@ PyObject* symmetrize(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyObject* symmetrize_ft(PyObject *self, PyObject *args)
-{
-    PyArrayObject* a_g_obj;
-    PyArrayObject* b_g_obj;
-    PyArrayObject* op_cc_obj;
-    PyArrayObject* ft_c_obj;
-   
-    if (!PyArg_ParseTuple(args, "OOOO", &a_g_obj, &b_g_obj, &op_cc_obj, &ft_c_obj)) 
-        return NULL;
-
-    const double* ft = (const double*)PyArray_DATA(ft_c_obj);
-    const long* C = (const long*)PyArray_DATA(op_cc_obj);
-    int ng0 = PyArray_DIMS(a_g_obj)[0];
-    int ng1 = PyArray_DIMS(a_g_obj)[1];
-    int ng2 = PyArray_DIMS(a_g_obj)[2];
-
-    int ft0 = (int)(ft[0]*ng0);
-    int ft1 = (int)(ft[1]*ng1);
-    int ft2 = (int)(ft[2]*ng2);   
-    
-    const double* a_g = (const double*)PyArray_DATA(a_g_obj);
-    double* b_g = (double*)PyArray_DATA(b_g_obj);
-    for (int g0 = 0; g0 < ng0; g0++)
-        
-        for (int g1 = 0; g1 < ng1; g1++)
-            for (int g2 = 0; g2 < ng2; g2++) {
-              int p0 = ((C[0] * g0 + C[3] * g1 + C[6] * g2 - ft0) % ng0 + ng0) % ng0;
-              int p1 = ((C[1] * g0 + C[4] * g1 + C[7] * g2 - ft1) % ng1 + ng1) % ng1;
-              int p2 = ((C[2] * g0 + C[5] * g1 + C[8] * g2 - ft2) % ng2 + ng2) % ng2;
-              b_g[(p0 * ng1 + p1) * ng2 + p2] += *a_g++;
-            }
-    
-    Py_RETURN_NONE;
-}
 
 PyObject* symmetrize_wavefunction(PyObject *self, PyObject *args)
 {

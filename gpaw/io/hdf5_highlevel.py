@@ -7,7 +7,7 @@
 # h5py code is used directly except where explicitly noted
 
 import numpy as np
-from _hdf5 import *
+from _gpaw_hdf5 import *
 
 def numpy_type_from_h5(datatype):
     """Simple conversion from HDF5 datatype to NumPy dtype"""

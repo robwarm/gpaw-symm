@@ -6,8 +6,6 @@ Quasi-particle spectrum in the GW approximation: tutorial
 
 For a brief introduction to the GW theory and the details of its implementation in GPAW, see :ref:`gw_theory`.
 
-**For GW calculations, the latest development release is required.**
-
 More information can be found here:
 
     \F. Hüser, T. Olsen, and K. S. Thygesen

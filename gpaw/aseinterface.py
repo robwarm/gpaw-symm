@@ -41,12 +41,11 @@ class GPAW(PAW):
             # Free energy:
             return Hartree * self.hamiltonian.Etot
         else:
-            # Energy extrapolated to zero Kelvin:
-            if (isinstance(self.occupations, MethfesselPaxton) and
-                self.occupations.iter > 0):
-                raise NotImplementedError(
-                    'Extrapolation to zero width not implemeted for ' +
-                    'Methfessel-Paxton distribution with order > 0.')
+            # Energy extrapolated to zero width:
+            if isinstance(self.occupations, MethfesselPaxton):
+                return Hartree * (self.hamiltonian.Etot +
+                                  self.hamiltonian.S /
+                                  (self.occupations.iter + 2))
             return Hartree * (self.hamiltonian.Etot + 0.5 * self.hamiltonian.S)
 
     def get_forces(self, atoms):

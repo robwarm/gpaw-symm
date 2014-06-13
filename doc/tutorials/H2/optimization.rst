@@ -16,14 +16,7 @@ eV/Å.  The following script will do the job:
 
 The result is::
 
-  $[tut] python relax.py
-  experimental bond length:
-  hydrogen molecule energy: -6.35 eV
-  bondlength              :  0.74 Ang
-
-  PBE energy minimum:
-  hydrogen molecule energy: -6.35 eV
-  bondlength              :  0.73 Ang
+.. literalinclude:: optimization.txt
 
 .. note::
    You must run the :ref:`atomization <atomization_energy>` script first.

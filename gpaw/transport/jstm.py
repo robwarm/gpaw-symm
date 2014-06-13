@@ -81,7 +81,7 @@ class LocalizedFunctions:
         
     def restrict(self):
         """Restricts the box of the object to the current grid"""
-        start_c = np.maximum(self.corner_c, np.zeros(3))
+        start_c = np.maximum(self.corner_c, np.zeros(3, int))
         stop_c = np.minimum(self.corner_c + self.size_c, self.gd.N_c)
         if (start_c < stop_c).all():
             astart_c = start_c - self.corner_c
@@ -967,7 +967,7 @@ class STM:
         for i in range(n):
             grpt = start + v * i
             if np.round((grpt % 1), 5).any(): # Interpolate if nessesary
-                C = np.empty((2, 2, 2)) # find four nearest neighbours
+                C = np.empty((2, 2, 2), int) # find four nearest neighbours
                 C[0,0] = np.floor(grpt)
                 C[1,0] = C[0, 0] + np.array([1, 0])
                 C[0,1] = C[0, 0] + np.array([0, 1])
@@ -1434,7 +1434,7 @@ class SrfCell:
         sizez = srf_vt_G.shape[2]
 
         # New size of the extended grid in the z direction.
-        newsizez = sizez + 10.0 / Bohr / sgd.h_cv[2, 2]
+        newsizez = sizez + int(10.0 / Bohr / sgd.h_cv[2, 2])
         
         # The extended potential
         vt_G = np.zeros(tuple(newsize_c) + (newsizez,))

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from ase import Atoms
 from gpaw import GPAW
 

@@ -8,7 +8,7 @@ from gpaw.mixer import Mixer
 from gpaw import ConvergenceError
 from gpaw.mpi import rank
 
-from gpaw.eigensolvers.rmm_diis import RMM_DIIS
+from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 
 from gpaw import setup_paths
 
