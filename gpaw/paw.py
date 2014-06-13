@@ -259,11 +259,26 @@ class PAW(PAWTextOutput):
             self.print_cell_and_parameters()
 
         self.timer.start('SCF-cycle')
+               
+        i = 0
+        print self.wfs.kd.ibzk_kc
+        #print i
+        print self.hamiltonian.Ekin, self.hamiltonian.Ekin0, self.hamiltonian.Epot, self.hamiltonian.Exc, self.hamiltonian.Eext
+        #print self.occupations
         for iter in self.scf.run(self.wfs, self.hamiltonian, self.density,
                                  self.occupations):
             self.iter = iter
             self.call_observers(iter)
             self.print_iteration(iter)
+            
+            #if i == 1:
+                # check stuff
+                #print self.density.rhot_g
+                #exit()
+            i += 1
+           # print i
+            print self.hamiltonian.Ekin, self.hamiltonian.Ekin0, self.hamiltonian.Epot, self.hamiltonian.Exc, self.hamiltonian.Eext
+            #exit()
         self.timer.stop('SCF-cycle')
 
         if self.scf.converged:
@@ -320,6 +335,9 @@ class PAW(PAWTextOutput):
             self.atoms = atoms.copy()
 
         par = self.input_parameters
+
+        # for testing
+        #par.lft = True
 
         world = par.communicator
         if world is None:

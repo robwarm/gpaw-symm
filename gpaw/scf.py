@@ -43,11 +43,15 @@ class SCFLoop:
             return
         
         for iter in range(1, self.maxiter + 1):
+            #print "iter:", iter
             wfs.eigensolver.iterate(hamiltonian, wfs)
             occupations.calculate(wfs)
+            print 'occupations:'
+            print occupations.e_band
             # XXX ortho, dens, wfs?
 
             energy = hamiltonian.get_energy(occupations)
+            #print 'energies:', energy
             self.energies.append(energy)
             self.check_convergence(density, wfs.eigensolver)
             yield iter
@@ -56,7 +60,10 @@ class SCFLoop:
                 break
 
             if iter > self.niter_fixdensity:
+                #print "update density and hamiltonian"
                 density.update(wfs)
+                #print density.rhot_g
+                #exit()
                 hamiltonian.update(density)
             else:
                 hamiltonian.npoisson = 0

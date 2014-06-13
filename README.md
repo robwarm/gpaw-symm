@@ -14,3 +14,5 @@ IMPORTANT ISSUES:
 - rpa does not work, but I won't fix, because people are working on new version.
   The following tests will fail:
             rpa_energy_Si.py
+            chi0.py
+            
