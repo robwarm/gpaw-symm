@@ -56,7 +56,7 @@ def to1bz(bzk_kc, cell_cv):
 class KPointDescriptor:
     """Descriptor-class for k-points."""
 
-    def __init__(self, kpts, nspins=1, collinear=True):
+    def __init__(self, kpts, nspins=1, collinear=True, lft=False):
         """Construct descriptor object for kpoint/spin combinations (ks-pair).
 
         Parameters
@@ -110,8 +110,8 @@ class KPointDescriptor:
         self.nbzkpts = len(self.bzk_kc)
         
         # Gamma-point calculation?
+        self.lft = lft
         self.gamma = self.nbzkpts == 1 and not self.bzk_kc[0].any()
-            
         self.set_symmetry(None, None, usesymm=None)
         self.set_communicator(mpi.serial_comm)
 
@@ -168,7 +168,8 @@ class KPointDescriptor:
 
             # Construct a Symmetry instance containing the identity operation
             # only
-            self.symmetry = Symmetry(id_a, atoms.cell / Bohr, atoms.pbc)
+            self.symmetry = Symmetry(id_a, atoms.cell / Bohr, atoms.pbc, fractrans=self.lft)
+            self.lft = self.symmetry.lft
         else:
             self.symmetry = None
         
@@ -185,8 +186,26 @@ class KPointDescriptor:
             if usesymm:
                 # Find symmetry operations of atoms
                 self.symmetry.analyze(atoms.get_scaled_positions())
-                
+              
                 if N_c is not None:
+                    if self.lft:
+                        # the factor (denominator) the grid must follow
+                        factor = np.ones(3)
+                        indexes = np.where(np.abs(self.symmetry.ft_sc) > 1e-3)
+                        for i in range(len(indexes[0])):
+                            # find smallest common denominator
+                            a = factor[indexes[1][i]]
+                            b = np.rint(1. /  self.symmetry.ft_sc[indexes[0][i]][indexes[1][i]])
+                            factor[indexes[1][i]] = a*b
+                            while b != 0:
+                                rem = a % b
+                                a = b
+                                b = rem
+                            factor[indexes[1][i]] /= a 
+                        Nnew_c = np.array(np.rint(N_c / factor)*factor,int)
+                        # make sure new grid is not less dense
+                        Nnew_c = np.array(np.where(Nnew_c >= N_c, Nnew_c, Nnew_c+factor), int)
+                        N_c = Nnew_c
                     self.symmetry.prune_symmetries_grid(N_c)
 
             (self.ibzk_kc, self.weight_k,
@@ -205,6 +224,8 @@ class KPointDescriptor:
             self.nks = self.nibzkpts * self.nspins
         else:
             self.nks = self.nibzkpts
+
+        return N_c
 
     def set_communicator(self, comm):
         """Set k-point communicator."""

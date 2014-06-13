@@ -717,8 +717,14 @@ class PWWaveFunctions(FDPWWaveFunctions):
                 kpt.psit_nG[n] = self.pd.fft(psit_nR[n] * emikr_R, kpt.q)
 
     def random_wave_functions(self, mynao):
-        rs = np.random.RandomState(self.world.rank)
+        # rbw
+        # The standard initialisation once with rank make my debugging horrible.
+        # Instead reinitialise every time. Maybe not good fo production. But very 
+        # good for debugging.
+        # rbw
+        #rs = np.random.RandomState(self.world.rank)
         for kpt in self.kpt_u:
+            rs = np.random.RandomState(self.world.rank)
             psit_nG = kpt.psit_nG[mynao:]
             weight_G = 1.0 / (1.0 + self.pd.G2_qG[kpt.q])
             psit_nG.real = rs.uniform(-1, 1, psit_nG.shape) * weight_G
