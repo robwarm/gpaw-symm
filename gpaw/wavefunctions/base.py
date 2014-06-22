@@ -108,8 +108,8 @@ class WaveFunctions(EmptyWaveFunctions):
         
         self.timer.start('Symmetrize density')
         for nt_G in nt_sG:
-            ##rbw: do not use frac_translational here. It's broken
-            self.symmetry.symmetrize_ft_no(nt_G, self.gd)
+            ##rbw: use fractional translations aware routine
+            self.symmetry.symmetrize_ft(nt_G, self.gd)
         self.timer.stop('Symmetrize density')
 
     def add_to_density_from_k_point(self, nt_sG, kpt):
