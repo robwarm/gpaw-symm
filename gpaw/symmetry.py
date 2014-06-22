@@ -181,11 +181,17 @@ class Symmetry:
                             a_sa_ft.append(a_a)
                             opftok_ft.append(ft)
 
-        # add symmetry operations with fractional translations at the end
-        self.a_sa = np.concatenate((np.array(a_sa), np.array(a_sa_ft)))
-        self.op_scc = np.concatenate((np.array(opok), np.array(opok_ft)))
+        self.a_sa = np.array(a_sa)
+        self.op_scc = np.array(opok)
         #self.opnum_s = np.array(opnumok)
-        self.ft_sc = np.concatenate((np.array(opftok), np.array(opftok_ft)))
+        self.ft_sc = np.array(opftok) 
+
+        # add symmetry operations with fractional translations at the end
+        if self.lft and len(opok_ft) >= 1:
+            self.a_sa = np.concatenate((a_sa, np.array(a_sa_ft)))
+            self.op_scc = np.concatenate((opok, np.array(opok_ft)))
+            self.ft_sc = np.concatenate((opftok, np.array(opftok_ft)))
+
         self.lft_s = np.sum(np.abs(self.ft_sc),axis=1) > self.tol
         self.inversion = (self.op_scc == 
                           -np.eye(3, dtype=int)).all(2).all(1).any()

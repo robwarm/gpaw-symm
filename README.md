@@ -13,6 +13,13 @@ Funny that is.
 
 IMPORTANT ISSUES:
 
+- after lastest update get funy numpy warnings, which don't make sense:
+/home/rbw/programs/gpaw/gpaw/symmetry.py:172: RuntimeWarning: divide by zero encountered in divide
+  invft = np.where( np.abs(ft) > 0.01, 1./ft, 0.)
+/home/rbw/programs/gpaw/gpaw/symmetry.py:176: RuntimeWarning: divide by zero encountered in divide
+  ft = np.where( np.abs(invft_int) > 1e-4, 1./invft_int, 0.)
+
+
 - rpa does not work, but I won't fix, because people are working on new version.
   The following tests will fail:
             rpa_energy_Si.py

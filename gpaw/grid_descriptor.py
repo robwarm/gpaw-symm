@@ -418,10 +418,7 @@ class GridDescriptor(Domain):
                 if ft_sc == None:
                     _gpaw.symmetrize(A_g, B_g, op_cc)
                 else:
-                    #B_g = np.zeros_like(A_g)
                     _gpaw.symmetrize_ft(A_g, B_g, op_cc, ft_sc[i])
-                   # print 'symmetrize ',i, ft_sc[i]
-                   # print B_g[0][0]
         else:
             B_g = None
         self.distribute(B_g, a_g)
