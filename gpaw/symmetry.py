@@ -66,6 +66,7 @@ class Symmetry:
         """
         self.find_lattice_symmetry()
         self.prune_symmetries_atoms(spos_ac)
+        #self.symmetrize_positions(spos_ac)
 
     def find_lattice_symmetry(self):
         """Determine list of symmetry operations.
@@ -139,9 +140,13 @@ class Symmetry:
 
         # go through all symmetry operations
         opok = []
-        opnumok = []
+        #opnumok = []
         a_sa = []
         opftok = []
+        
+        opok_ft = []
+        a_sa_ft = []
+        opftok_ft = []
         
         #for op_cc in self.op_scc:
         for i, op_cc in enumerate(self.op_scc):
@@ -171,15 +176,16 @@ class Symmetry:
                         ft = np.where( np.abs(invft_int) > 1e-4, 1./invft_int, 0.)
                         ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft, a_ib)
                         if ok:
-                            opok.append(op_cc)
+                            opok_ft.append(op_cc)
                             #if len(self.opnum_s) > 0: opnumok.append(self.opnum_s[i])
-                            a_sa.append(a_a)
-                            opftok.append(ft)
+                            a_sa_ft.append(a_a)
+                            opftok_ft.append(ft)
 
-        self.a_sa = np.array(a_sa)
-        self.op_scc = np.array(opok)
+        # add symmetry operations with fractional translations at the end
+        self.a_sa = np.concatenate((np.array(a_sa), np.array(a_sa_ft)))
+        self.op_scc = np.concatenate((np.array(opok), np.array(opok_ft)))
         #self.opnum_s = np.array(opnumok)
-        self.ft_sc = np.array(opftok)
+        self.ft_sc = np.concatenate((np.array(opftok), np.array(opftok_ft)))
         self.lft_s = np.sum(np.abs(self.ft_sc),axis=1) > self.tol
         self.inversion = (self.op_scc == 
                           -np.eye(3, dtype=int)).all(2).all(1).any()
@@ -311,7 +317,6 @@ class Symmetry:
 
     def symmetrize(self, a, gd):
         """Symmetrize array."""
-        
         gd.symmetrize(a, self.op_scc)
 
     def symmetrize_ft_no(self, a, gd):
@@ -329,7 +334,23 @@ class Symmetry:
 
     def symmetrize_positions(self, spos_ac):
         """Symmetrizes the atomic positions."""
-        pass
+        print "Initial positions"
+        print spos_ac
+        spos_tmp_ac = np.empty_like(spos_ac)
+        spos_new_ac = np.empty_like(spos_ac)
+        for i, op_cc in enumerate(self.op_scc):
+            spos_tmp_ac[:] = 0.
+            for a in range(len(spos_ac)):
+                spos_c = np.dot(spos_ac[a], op_cc)  - self.ft_sc[i]
+              #bring back the negative ones
+                spos_c = spos_c-np.floor(spos_c+0.1)
+                spos_tmp_ac[self.a_sa[i][a]] += spos_c
+            spos_new_ac += spos_tmp_ac
+        
+        spos_new_ac /= len(self.op_scc)
+
+        print "Symmetrized positions"
+        print spos_new_ac
 
     def symmetrize_wavefunction(self, a_g, kibz_c, kbz_c, op_cc,
                                 time_reversal):
