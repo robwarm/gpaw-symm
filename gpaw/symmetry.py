@@ -160,15 +160,17 @@ class Symmetry:
                 ftrans_sc = sposrot_ac[a_ib.values()[0]] - spos_ac[a_ib.values()[0][0]]
                 ftrans_sc -= np.rint(ftrans_sc)
                 for ft in ftrans_sc:
-                    #print ft
-                    ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft, a_ib)
-                    if ok:
-                        # fractional translations must commensurate with the grids
-                        # else we have nothing but trouble.
-                        # To ensure this, we only accept fractional translations,
-                        # which are rational, eg. 1/2, 1/3 etc
-                        invft = np.where( np.abs(ft) > 0.1, np.abs(1./ft), 0.)
-                        if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0)), atol=1e-5):
+                    # fractional translations must commensurate with the grids
+                    # else we have nothing but trouble.
+                    # To ensure this, we only accept fractional translations,
+                    # which are rational, eg. 1/2, 1/3 etc
+                    invft = np.where( np.abs(ft) > 0.01, 1./ft, 0.)
+                    invft_int = np.rint(invft)
+                    if np.allclose(invft, invft_int, atol=1e-5):
+                    #if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0)), atol=1e-5):
+                        ft = np.where( np.abs(invft_int) > 1e-4, 1./invft_int, 0.)
+                        ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft, a_ib)
+                        if ok:
                             opok.append(op_cc)
                             #if len(self.opnum_s) > 0: opnumok.append(self.opnum_s[i])
                             a_sa.append(a_a)
@@ -324,6 +326,10 @@ class Symmetry:
             gd.symmetrize(a, self.op_scc, self.ft_sc)
         else:
             gd.symmetrize(a, self.op_scc)
+
+    def symmetrize_positions(self, spos_ac):
+        """Symmetrizes the atomic positions."""
+        pass
 
     def symmetrize_wavefunction(self, a_g, kibz_c, kbz_c, op_cc,
                                 time_reversal):
