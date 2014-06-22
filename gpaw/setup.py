@@ -1337,7 +1337,7 @@ class Setups(list):
             op_vv = np.dot(np.linalg.inv(symmetry.cell_cv),
                            np.dot(op_cc, symmetry.cell_cv))
             R_slmm.append([rotation(l, op_vv) for l in range(4)])
-        
+
         for setup in self.setups.values():
             setup.calculate_rotations(R_slmm)
 
