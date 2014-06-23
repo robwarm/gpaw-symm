@@ -169,17 +169,21 @@ class Symmetry:
                     # else we have nothing but trouble.
                     # To ensure this, we only accept fractional translations,
                     # which are rational, eg. 1/2, 1/3 etc
-                    invft = np.where( np.abs(ft) > 0.01, 1./ft, 0.)
+                    whereft = np.where( np.abs(ft) > 1e-4)[0]
+                    invft = np.zeros(shape=(3))
+                    invft[whereft] = 1./ft[whereft]
                     invft_int = np.rint(invft)
                     if np.allclose(invft, invft_int, atol=1e-5):
                     #if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0)), atol=1e-5):
-                        ft = np.where( np.abs(invft_int) > 1e-4, 1./invft_int, 0.)
+                        ft = np.zeros(shape=(3))
+                        ft[whereft] =   1/invft_int[whereft]
                         ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft, a_ib)
                         if ok:
                             opok_ft.append(op_cc)
                             #if len(self.opnum_s) > 0: opnumok.append(self.opnum_s[i])
                             a_sa_ft.append(a_a)
                             opftok_ft.append(ft)
+
 
         self.a_sa = np.array(a_sa)
         self.op_scc = np.array(opok)
