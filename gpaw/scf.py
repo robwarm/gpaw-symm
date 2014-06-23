@@ -44,6 +44,7 @@ class SCFLoop:
         
         for iter in range(1, self.maxiter + 1):
             wfs.eigensolver.iterate(hamiltonian, wfs)
+            occupations.calculate(wfs)
 
             energy = hamiltonian.get_energy(occupations)
             self.energies.append(energy)
