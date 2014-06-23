@@ -2,6 +2,7 @@
 build/
 .svn/
 
+.directory
 *.log
 *.o
 *.pyc

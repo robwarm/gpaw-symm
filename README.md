@@ -8,20 +8,17 @@ It looks as if it is not compatible with 'fd' mode, because 'fd' needs grids div
 the gpaw initilization does not allow to set things in the order we need. It is pretty the problem,
 that the symmetry part is a subclass of kpt_descriptor... not good for us.
 
-Current version seems to work for orthorhombic and related cells (e.g. stishovite), but not with trigonal (e.g. quartz).
-Funny that is.
 
 IMPORTANT ISSUES:
 
-- after lastest update get funy numpy warnings, which don't make sense:
-/home/rbw/programs/gpaw/gpaw/symmetry.py:172: RuntimeWarning: divide by zero encountered in divide
-  invft = np.where( np.abs(ft) > 0.01, 1./ft, 0.)
-/home/rbw/programs/gpaw/gpaw/symmetry.py:176: RuntimeWarning: divide by zero encountered in divide
-  ft = np.where( np.abs(invft_int) > 1e-4, 1./invft_int, 0.)
-
+- PW seems to work, LCAO did not work for quartz
 
 - rpa does not work, but I won't fix, because people are working on new version.
   The following tests will fail:
-            rpa_energy_Si.py
+            1   core:
+            #########rpa_energy_Si.py
             chi0.py
+            
+            2+cores:
+            ???????
             
