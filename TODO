@@ -1,4 +1,5 @@
 
-- find last bits to make PW work
-- check LCAO mode
+- check LCAO mode problem with quartz
+    -> could be the non-orthogonal lattice vectors or the 1/3 translation
+
 
