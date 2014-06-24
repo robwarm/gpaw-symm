@@ -39,7 +39,7 @@ class Symmetry:
         ``id_a``              ????
         ``cell_cv``           Lattice vectors
         ``pbc_c``             (bool) Periodic boundary conditions
-        ``tol``               Tolerance for symmetry detection (Not used properly)
+        ``tol``               Tolerance for symmetry detection, use with care
         ``usefractrans``      (bool) Use fractional translations/non-symmorphic symmetries
         ``op_scc``            Array of rotation matrices
         ``ft_sc``             Array of fractional translation vectors
@@ -48,6 +48,9 @@ class Symmetry:
         ``inversion``         (bool) Have inversion
         ===================  =================================================
         """
+    
+        # Notes:
+        #   - "ft" in variable names stands for fractional translation 
 
 
         self.id_a = id_a
@@ -70,7 +73,6 @@ class Symmetry:
         self.inversion = False
 
 
-
     def analyze(self, spos_ac):
         """Determine list of symmetry operations.
 
@@ -81,6 +83,7 @@ class Symmetry:
         self.find_lattice_symmetry()
         self.prune_symmetries_atoms(spos_ac)
         #self.symmetrize_positions(spos_ac)
+
 
     def find_lattice_symmetry(self):
         """Determine list of symmetry operations.
@@ -152,24 +155,24 @@ class Symmetry:
                     #print "Found supercell, deactivate fractional translations."
                     break
 
-        # go through all symmetry operations
-        opok = []
-        a_sa = []
-        opftok = []
+        # empty lists for accepted symmetry operations, the fractrans ones extra
+        ok_op_scc = []
+        ok_a_sa = []
+        ok_ft_sc = []
         
-        opok_ft = []
-        a_sa_ft = []
-        opftok_ft = []
+        ok_op_scc_ft = []
+        ok_a_sa_ft = []
+        ok_ft_sc_ft = []
         
-        #for op_cc in self.op_scc:
+        # go through all possible symmetry operations
         for i, op_cc in enumerate(self.op_scc):
             # first ignore fractional translations
             ft_c = np.zeros(3, float)
             ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft_c, a_ib)
             if ok:
-                opok.append(op_cc)
-                a_sa.append(a_a)
-                opftok.append([0.,0.,0.])
+                ok_op_scc.append(op_cc)
+                ok_a_sa.append(a_a)
+                ok_ft_sc.append([0.,0.,0.])
             elif self.usefractrans:
                 # check fractional translations
                 sposrot_ac = np.dot(spos_ac, op_cc)
@@ -184,26 +187,26 @@ class Symmetry:
                     invft_c = np.zeros(3, float)
                     invft_c[whereft] = 1. / ft_c[whereft]
                     invft_rounded_c = np.rint(invft_c)
-                    if np.allclose(invft_c, invft_rounded_c, atol=1e-5):
+                    if np.allclose(invft_c, invft_rounded_c, atol=self.tol*100.):
                     #if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0)), atol=1e-5):
                         ft_c = np.zeros(3, float)
                         ft_c[whereft] = 1. / invft_rounded_c[whereft]
                         ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft_c, a_ib)
                         if ok:
-                            opok_ft.append(op_cc)
-                            a_sa_ft.append(a_a)
-                            opftok_ft.append(ft_c)
+                            ok_op_scc_ft.append(op_cc)
+                            ok_a_sa_ft.append(a_a)
+                            ok_ft_sc_ft.append(ft_c)
 
 
-        self.a_sa = np.array(a_sa)
-        self.op_scc = np.array(opok)
-        self.ft_sc = np.array(opftok) 
+        self.a_sa = np.array(ok_a_sa)
+        self.op_scc = np.array(ok_op_scc)
+        self.ft_sc = np.array(ok_ft_sc) 
 
         # add symmetry operations with fractional translations at the end
-        if self.usefractrans and len(opok_ft) >= 1:
-            self.a_sa = np.concatenate((a_sa, np.array(a_sa_ft)))
-            self.op_scc = np.concatenate((opok, np.array(opok_ft)))
-            self.ft_sc = np.concatenate((opftok, np.array(opftok_ft)))
+        if self.usefractrans and len(ok_op_scc_ft) >= 1:
+            self.a_sa = np.concatenate((self.a_sa, np.array(ok_a_sa_ft)))
+            self.op_scc = np.concatenate((self.op_scc, np.array(ok_op_scc_ft)))
+            self.ft_sc = np.concatenate((self.ft_sc, np.array(ok_ft_sc_ft)))
 
         self.usefractrans_s = np.sum(np.abs(self.ft_sc),axis=1) > self.tol
         self.inversion = (self.op_scc == 
@@ -264,6 +267,7 @@ class Symmetry:
 
         return ok, a_a
 
+
     def check(self, spos_ac):
         """Check if positions satisfy symmetry operations."""
 
@@ -271,6 +275,7 @@ class Symmetry:
         self.prune_symmetries_atoms(spos_ac)
         if len(self.op_scc) < nsymold:
             raise RuntimeError('Broken symmetry!')
+
 
     def reduce(self, bzk_kc, comm=None):
         """Reduce k-points to irreducible part of the BZ.
@@ -324,6 +329,7 @@ class Symmetry:
         return (bzk_kc[ibz2bz_k], weight_k,
                 sym_k, time_reversal_k, bz2ibz_k, ibz2bz_k, bz2bz_ks)
 
+
     def prune_symmetries_grid(self, N_c):
         """Remove symmetries that are not satisfied by the grid."""
 
@@ -337,9 +343,11 @@ class Symmetry:
         self.a_sa = np.array(a_sa)
         self.op_scc = np.array(U_scc)
 
+
     def symmetrize(self, a, gd):
         """Symmetrize array."""
         gd.symmetrize(a, self.op_scc)
+
 
     ### Should not need that one
     #def symmetrize_ft_no(self, a, gd):
@@ -348,6 +356,7 @@ class Symmetry:
         #op_scc = self.op_scc[np.where(self.usefractrans_s==False)[0]]
         #gd.symmetrize(a, op_scc)
 
+
     def symmetrize_ft(self, a, gd):
         """Symmetrize array, including fractional translations."""
         if np.any(self.usefractrans_s):
@@ -355,25 +364,32 @@ class Symmetry:
         else:
             gd.symmetrize(a, self.op_scc)
 
+
     def symmetrize_positions(self, spos_ac):
-        """Symmetrizes the atomic positions."""
+        """Symmetrizes the atomic positions.
+        
+        That routine could use some more work.
+        """
         print "Initial positions"
-        print spos_ac
-        spos_tmp_ac = np.empty_like(spos_ac)
-        spos_new_ac = np.empty_like(spos_ac)
+        for spos_c in spos_ac:
+            print "%19.16f %19.16f %19.16f" % (spos_c[0], spos_c[1], spos_c[2]) 
+        spos_tmp_ac = np.zeros_like(spos_ac)
+        spos_new_ac = np.zeros_like(spos_ac)
         for i, op_cc in enumerate(self.op_scc):
             spos_tmp_ac[:] = 0.
             for a in range(len(spos_ac)):
                 spos_c = np.dot(spos_ac[a], op_cc)  - self.ft_sc[i]
-              #bring back the negative ones
-                spos_c = spos_c-np.floor(spos_c+0.1)
+                #bring back the negative ones
+                spos_c = spos_c - np.floor(spos_c + 1e-5)
                 spos_tmp_ac[self.a_sa[i][a]] += spos_c
             spos_new_ac += spos_tmp_ac
         
         spos_new_ac /= len(self.op_scc)
 
         print "Symmetrized positions"
-        print spos_new_ac
+        for spos_c in spos_new_ac:
+            print "%19.16f %19.16f %19.16f" % (spos_c[0], spos_c[1], spos_c[2]) 
+
 
     def symmetrize_wavefunction(self, a_g, kibz_c, kbz_c, op_cc,
                                 time_reversal):
@@ -416,10 +432,10 @@ class Symmetry:
                 _gpaw.symmetrize_wavefunction(a_g, b_g, op_cc.T.copy(),
                                               kibz_c, kbz_c)
                 return b_g
+
         
     def symmetrize_forces(self, F0_av):
-        """Symmetrice forces."""
-        
+        """Symmetrize forces."""
         F_ac = np.zeros_like(F0_av)
         for map_a, op_cc in zip(self.a_sa, self.op_scc):
             op_vv = np.dot(np.linalg.inv(self.cell_cv),
@@ -427,9 +443,10 @@ class Symmetry:
             for a1, a2 in enumerate(map_a):
                 F_ac[a2] += np.dot(F0_av[a1], op_vv)
         return F_ac / len(self.op_scc)
+
         
     def print_symmetries(self, text):
-        
+        """Print symmetry information."""
         n = len(self.op_scc)
         nft = len(np.where(self.usefractrans_s)[0])
         if nft == 0:
