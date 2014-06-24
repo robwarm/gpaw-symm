@@ -63,7 +63,7 @@ class InputParameters(dict):
                                  'eigenstates': 4.0e-8,  # eV^2
                                  'bands':       'occupied'}),
             ('realspace',       None),
-            ('lft',             False)
+            ('usefractrans',    False)
             ])
         dict.update(self, kwargs)
 
