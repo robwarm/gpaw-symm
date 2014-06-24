@@ -579,8 +579,10 @@ There exist three special names, that if used, does not specify a file name:
 
 * ``'ae'`` is used for specifying all-electron mode for an
   atom. I.e. no PAW or pseudo potential is used.
-* ``'hgh'`` is used to specify a Hartwigsen-Goedecker-Hutter
-  pseudopotential (no file necessary).
+* ``'hgh'`` is used to specify a norm-conserving Hartwigsen-Goedecker-Hutter
+  pseudopotential (no file necessary).  Some elements have better
+  semicore pseudopotentials.  To use those, specify ``'hgh.sc'``
+  for the elements or atoms in question.
 * ``'ghost'`` is used to indicated a *ghost* atom in LCAO mode, 
   see :ref:`ghost-atoms`. 
 

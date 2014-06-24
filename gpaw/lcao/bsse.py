@@ -66,6 +66,7 @@ class GhostSetup(BaseSetup):
         self.f_j = [0.0]
         self.n_j = [0]
         self.l_j = [0]
+        self.l_orb_j = [0]
         self.nj = 1
         self.lq = None # XXXX
 

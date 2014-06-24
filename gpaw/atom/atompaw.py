@@ -223,7 +223,8 @@ class AtomGridDescriptor(EquidistantRadialGridDescriptor):
         pass
     def get_grid_spacings(self):
         return self.h_cv.diagonal()
-    
+    def get_size_of_global_array(self):
+        return np.array(len(self.N_c))
 
 class AtomOccupations(OccupationNumbers):
     def __init__(self, f_sln):

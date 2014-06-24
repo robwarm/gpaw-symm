@@ -164,7 +164,7 @@ class BaseSetup:
                                2 * l_j + 1, False)
         
         # Projector function indices:
-        nj = len(self.n_j)
+        nj = len(self.n_j) # or l_j?  Seriously.
 
         # distribute to the atomic wave functions
         i = 0
@@ -172,10 +172,10 @@ class BaseSetup:
         for phit in self.phit_j:
             l = phit.get_angular_momentum_number()
 
-            # Skip projector functions not in basis set:
-            while j < nj and self.l_j[j] != l:
+            # Skip functions not in basis set:
+            while j < nj and self.l_orb_j[j] != l:
                 j += 1
-            if j < nj:
+            if j < len(f_j): # lengths of f_j and l_j may differ
                 f = f_j[j]
                 f_s = f_sj[:, j]
             else:
@@ -225,13 +225,13 @@ class BaseSetup:
 
         D_sii = np.zeros((nspins, ni, ni))
         D_sp = np.zeros((nspins, ni * (ni + 1) // 2))
-        nj = len(self.n_j)
+        nj = len(self.l_j)
         j = 0
         i = 0
         ib = 0
         for phit in self.phit_j:
             l = phit.get_angular_momentum_number()
-            # Skip projector functions not in basis set:
+            # Skip functions not in basis set:
             while j < nj and self.l_j[j] != l:
                 i += 2 * self.l_j[j] + 1
                 j += 1
@@ -400,7 +400,8 @@ class BaseSetup:
         return self.I4_pp
 
     def get_default_nbands(self):
-        return sum([2 * l + 1 for (l, n) in zip(self.l_j, self.n_j)
+        assert len(self.l_orb_j) == len(self.n_j)
+        return sum([2 * l + 1 for (l, n) in zip(self.l_orb_j, self.n_j)
                     if n > 0])
 
 
@@ -459,6 +460,7 @@ class LeanSetup(BaseSetup):
         self.f_j = s.f_j
         self.n_j = s.n_j
         self.l_j = s.l_j
+        self.l_orb_j = s.l_orb_j
         self.nj = len(s.l_j)
 
         self.data = s.data
@@ -592,6 +594,7 @@ class Setup(BaseSetup):
         self.Nv = data.Nv
         self.Z = data.Z
         l_j = self.l_j = data.l_j
+        self.l_orb_j = data.l_orb_j
         n_j = self.n_j = data.n_j
         self.f_j = data.f_j
         self.eps_j = data.eps_j
@@ -1337,7 +1340,7 @@ class Setups(list):
             op_vv = np.dot(np.linalg.inv(symmetry.cell_cv),
                            np.dot(op_cc, symmetry.cell_cv))
             R_slmm.append([rotation(l, op_vv) for l in range(4)])
-
+        
         for setup in self.setups.values():
             setup.calculate_rotations(R_slmm)
 

@@ -78,7 +78,10 @@ class Domain:
                                    1])
 
         if np.product(self.parsize_c) != self.comm.size:
-            raise RuntimeError('Bad domain decomposition!')
+            raise RuntimeError('Bad domain decomposition! ' 
+                               'CPU counts %s do not multiply to '
+                               'communicator size %d' % (self.parsize_c,
+                                                         self.comm.size))
 
         self.parpos_c = self.get_processor_position_from_rank()
         self.find_neighbor_processors()

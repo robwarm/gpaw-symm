@@ -1,108 +1,22 @@
-from math import sqrt, pi
-
 import numpy as np
 from ase.data import atomic_numbers
 
 from gpaw.utilities import pack2
 from gpaw.utilities.tools import md5_new
-from gpaw.setup import BaseSetup
-from gpaw.spline import Spline
 from gpaw.atom.radialgd import AERadialGridDescriptor
 from gpaw.atom.atompaw import AtomPAW
 from gpaw.atom.configurations import configurations
 from gpaw.basis_data import Basis, BasisFunction
+from gpaw.pseudopotential import PseudoPotential
 
 setups = {} # Filled out during parsing below
 sc_setups = {} # Semicore
 
 
 # Tabulated values of Gamma(m + 1/2)
-half_integer_gamma = [sqrt(pi)]
+half_integer_gamma = [np.sqrt(np.pi)]
 for m in range(20):
     half_integer_gamma.append(half_integer_gamma[m] * (m + 0.5))
-
-
-class HGHSetup(BaseSetup):
-    def __init__(self, data, basis):
-        self.data = data
-
-        self.R_sii = None
-        self.HubU = None
-        self.lq = None
-
-        self.filename = None
-        self.fingerprint = None
-        self.symbol = data.symbol
-        self.type = data.name
-
-        self.Z = data.Z
-        self.Nv = data.Nv
-        self.Nc = data.Nc
-
-        self.ni = sum([2 * l + 1 for l in data.l_j])
-        self.pt_j = data.get_projectors()
-        self.phit_j = basis.tosplines()
-        self.basis = basis
-        self.nao = sum([2 * phit.get_angular_momentum_number() + 1
-                        for phit in self.phit_j])
-
-        self.Nct = 0.0
-        self.nct = Spline(0, 1.0, [0., 0., 0.])
-
-        self.lmax = 0
-
-        self.xc_correction = None
-
-        r, g = data.get_compensation_charge_function()
-        self.ghat_l = [Spline(0, r[-1], g)]
-        self.rcgauss = data.rcgauss
-
-        # accuracy is rather sensitive to this
-        self.vbar = data.get_local_potential()
-
-        _np = self.ni * (self.ni + 1) // 2
-        self.Delta0 = data.Delta0
-        self.Delta_pL = np.zeros((_np, 1))
-
-        self.E = 0.0
-        self.Kc = 0.0
-        self.M = 0.0
-        self.M_p = np.zeros(_np)
-        self.M_pp = np.zeros((_np, _np))
-
-        self.K_p = data.expand_hamiltonian_matrix()
-        self.MB = 0.0
-        self.MB_p = np.zeros(_np)
-        self.dO_ii = np.zeros((self.ni, self.ni))
-
-        self.f_j = data.f_j
-        self.n_j = data.n_j
-        self.l_j = data.l_j
-        self.nj = len(data.l_j)
-
-        # We don't really care about these variables
-        self.rcutfilter = None
-        self.rcore = None
-
-        self.N0_p = np.zeros(_np) # not really implemented
-        self.nabla_iiv = None
-        self.rnabla_iiv = None
-        self.rxp_iiv = None
-        self.phicorehole_g = None
-        self.rgd = data.rgd
-        self.rcut_j = data.rcut_j
-        self.tauct = None
-        self.Delta_iiL = None
-        self.B_ii = None
-        self.dC_ii = None
-        self.X_p = None
-        self.ExxC = None
-        self.dEH0 = 0.0
-        self.dEH_p = np.zeros(_np)
-        self.extra_xc_data = {}
-
-        self.wg_lg = None
-        self.g_lg = None
 
 
 class HGHSetupData:
@@ -129,7 +43,7 @@ class HGHSetupData:
 
     The non-local part contains KB projector functions which are
     essentially similar to those in PAW, while h_ij are constants.
-    h_ij are determined by setting the K_p variable of the normal
+    h_ij are provided by setting the K_p variable of the normal
     setup.
 
     Most other properties of a PAW setup do not exist for HGH setups, for
@@ -185,7 +99,7 @@ class HGHSetupData:
         self.Z = hghdata.Z
         self.Nc = hghdata.Z -  hghdata.Nv
         self.Nv = hghdata.Nv
-        self.rcgauss = sqrt(2.0) * hghdata.rloc
+        self.rcgauss = np.sqrt(2.0) * hghdata.rloc
 
         threshold = 1e-8
         if len(hghdata.c_n) > 0:
@@ -193,7 +107,7 @@ class HGHSetupData:
                                                        hghdata.c_n)
             gcutvbar, rcutvbar = self.find_cutoff(rgd.r_g, rgd.dr_g, vloc_g,
                                                   threshold)
-            self.vbar_g = sqrt(4.0 * pi) * vloc_g[:gcutvbar]
+            self.vbar_g = np.sqrt(4.0 * np.pi) * vloc_g[:gcutvbar]
         else:
             rcutvbar = 0.5
             gcutvbar = rgd.ceil(rcutvbar)
@@ -218,6 +132,7 @@ class HGHSetupData:
         assert nj == len(n_j)
         self.nj = nj
         self.l_j = l_j
+        self.l_orb_j = l_j
         self.n_j = n_j
 
         self.rcut_j = []
@@ -228,7 +143,7 @@ class HGHSetupData:
             # projector, but the coefficients h_ij should be zero so it
             # doesn't matter
             pt_g = create_hgh_projector(rgd.r_g, l, n, hghdata.v_l[l].r0)
-            norm = sqrt(np.dot(rgd.dr_g, pt_g**2 * rgd.r_g**2))
+            norm = np.sqrt(np.dot(rgd.dr_g, pt_g**2 * rgd.r_g**2))
             assert np.abs(1 - norm) < 1e-5, str(1 - norm)
             gcut, rcut = self.find_cutoff(rgd.r_g, rgd.dr_g, pt_g, threshold)
             if rcut < 0.5:
@@ -241,7 +156,7 @@ class HGHSetupData:
 
         # This is the correct magnitude of the otherwise normalized
         # compensation charge
-        self.Delta0 = -self.Nv / sqrt(4.0 * pi)
+        self.Delta0 = -self.Nv / np.sqrt(4.0 * np.pi)
 
         f_ln = self.hghdata.get_occupation_numbers()
         f_j = [0] * nj
@@ -290,7 +205,7 @@ class HGHSetupData:
         return K_p
 
     def __str__(self):
-        return "HGHSetup('%s')" % self.type
+        return "HGHSetupData('%s')" % self.type
 
     def __repr__(self):
         return self.__str__()
@@ -309,7 +224,8 @@ class HGHSetupData:
         gcutvbar = len(self.vbar_g)
         pl.plot(rgd.r_g[:gcutvbar], self.vbar_g, 'r', label='vloc',
                 linewidth=3)
-        rcc, gcc = self.get_compensation_charge_function()
+        rcc, gcc = self.get_compensation_charge_functions()
+        gcc = gcc[0]
 
         pl.plot(rcc, gcc * self.Delta0, 'b--', label='Comp charge [arb. unit]',
                 linewidth=3)
@@ -337,37 +253,16 @@ class HGHSetupData:
         return pt_j
 
     def create_basis_functions(self):
-        class SimpleBasis(Basis):
-            def __init__(self, symbol, l_j):
-                Basis.__init__(self, symbol, 'simple', readxml=False)
-                self.generatordata = 'simple'
-                self.d = 0.02
-                self.ng = 160
-                rgd = self.get_grid_descriptor()
-                bf_j = self.bf_j
-                rcgauss = rgd.r_g[-1] / 3.0
-                gauss_g = np.exp(-(rgd.r_g / rcgauss)**2.0)
-                for l in l_j:
-                    phit_g = rgd.r_g**l * gauss_g
-                    norm = (rgd.integrate(phit_g**2) / (4 * pi))**0.5
-                    phit_g /= norm
-                    bf = BasisFunction(l, rgd.r_g[-1], phit_g, 'gaussian')
-                    bf_j.append(bf)
-        b1 = SimpleBasis(self.symbol, range(max(self.l_j) + 1))
-        apaw = AtomPAW(self.symbol, [self.f_ln], h=0.05, rcut=9.0,
-                       basis={self.symbol: b1},
-                       setups={self.symbol : self},
-                       lmax=0, txt=None)
-        basis = apaw.extract_basis_functions()
-        return basis
+        from gpaw.pseudopotential import generate_basis_functions
+        return generate_basis_functions(self)
 
-    def get_compensation_charge_function(self):
+    def get_compensation_charge_functions(self):
         alpha = self.rcgauss**-2
         rcutgauss = self.rcgauss * 5.0 # smaller values break charge conservation
         r = np.linspace(0.0, rcutgauss, 100)
-        g = alpha**1.5 * np.exp(-alpha * r**2) * 4.0 / sqrt(pi)
+        g = alpha**1.5 * np.exp(-alpha * r**2) * 4.0 / np.sqrt(np.pi)
         g[-1] = 0.0
-        return r, g
+        return r, [0], [g]
 
     def get_local_potential(self):
         n = len(self.vbar_g)
@@ -376,7 +271,7 @@ class HGHSetupData:
     def build(self, xcfunc, lmax, basis, filter=None):
         if basis is None:
             basis = self.create_basis_functions()
-        setup = HGHSetup(self, basis)
+        setup = PseudoPotential(self, basis)
         setup.fingerprint = md5_new(str(self.hghdata)).hexdigest()
         return setup
 
@@ -599,6 +494,12 @@ def parse_hgh_setup(lines):
         nltokens = nonlocal.split()
         r0 = float(nltokens[0])
         h_n = [float(token) for token in nltokens[1:]]
+
+        #if h_n[-1] == 0.0: # Only spin-orbit contributes.  Discard.
+        #    h_n.pop()
+        # Actually the above causes trouble.  Probably it messes up state
+        # ordering or something else that shouldn't have any effect.
+        
         vnl = VNonLocal(l, r0, h_n)
         v_l.append(vnl)
         if l > 2:

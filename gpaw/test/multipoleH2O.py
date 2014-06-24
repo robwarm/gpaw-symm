@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-from ase.data.molecules import molecule
+from ase.structure import molecule
 from ase.parallel import parprint
 
 from gpaw import GPAW, PW

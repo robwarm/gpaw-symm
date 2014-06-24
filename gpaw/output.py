@@ -1,22 +1,21 @@
 import os
-import platform
 import sys
 import time
+import platform
 from math import log
-from math import sqrt
 
 import numpy as np
 import ase
-from ase.version import version as ase_version
-from ase.data import chemical_symbols
 from ase.units import Bohr, Hartree
+from ase.data import chemical_symbols
+from ase.version import version as ase_version
 
-from gpaw.utilities import devnull
-from gpaw.version import version
-from gpaw.utilities import scalapack
-from gpaw import dry_run, extra_parameters
-from gpaw.utilities.memory import maxrss
 import gpaw
+import _gpaw
+from gpaw.version import version
+from gpaw.utilities import devnull
+from gpaw.utilities.memory import maxrss
+from gpaw import dry_run, extra_parameters
 
 
 def initialize_text_stream(txt, rank, old_txt=None):
@@ -94,7 +93,14 @@ class PAWTextOutput:
         self.text('Date: ', time.asctime())
         self.text('Arch: ', uname[4])
         self.text('Pid:  ', os.getpid())
-        self.text('Dir:  ', os.path.dirname(gpaw.__file__))
+        self.text('gpaw: ', os.path.dirname(gpaw.__file__))
+        
+        # Find C-code:
+        c = getattr(_gpaw, '__file__', None)
+        if not c:
+            c = sys.executable
+        self.text('_gpaw:', os.path.normpath(c))
+                  
         self.text('ase:   %s (version %s)' %
                   (os.path.dirname(ase.__file__), ase_version))
         self.text('numpy: %s (version %s)' %

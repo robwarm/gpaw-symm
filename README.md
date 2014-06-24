@@ -15,10 +15,7 @@ IMPORTANT ISSUES:
 
 - rpa does not work, but I won't fix, because people are working on new version.
   The following tests will fail:
-            1   core:
-            #########rpa_energy_Si.py
+        - with 1 core:
             chi0.py
-            
-            2+cores:
-            ???????
-            
+        - not test with 2+cores
+          

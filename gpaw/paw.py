@@ -259,13 +259,11 @@ class PAW(PAWTextOutput):
             self.print_cell_and_parameters()
 
         self.timer.start('SCF-cycle')
-
         for iter in self.scf.run(self.wfs, self.hamiltonian, self.density,
                                  self.occupations):
             self.iter = iter
             self.call_observers(iter)
             self.print_iteration(iter)
-
         self.timer.stop('SCF-cycle')
 
         if self.scf.converged:
@@ -325,7 +323,6 @@ class PAW(PAWTextOutput):
 
         ##rbw for testing
         #par.lft = True
-
 
         world = par.communicator
         if world is None:
@@ -463,7 +460,10 @@ class PAW(PAWTextOutput):
                 nbands_from_atom = setup.get_default_nbands()
                 
                 # Any obscure setup errors?
-                assert nbands_from_atom >= -(-setup.Nv // 2)
+                if nbands_from_atom < -(-setup.Nv // 2):
+                    raise ValueError('Bad setup: This setup requests %d'
+                                     ' bands but has %d electrons.'
+                                     % (nbands_from_atom, setup.Nv))
                 nbands += nbands_from_atom
             nbands = min(nao, nbands)
         elif nbands > nao and mode == 'lcao':
