@@ -183,14 +183,15 @@ class Symmetry:
                     # else we have nothing but trouble.
                     # To ensure this, we only accept fractional translations,
                     # which are rational, eg. 1/2, 1/3 etc
+                    # multiply by 6, so that 2/3, 2/5, 3/5 etc work as well
                     whereft = np.where(np.abs(ft_c) > 1e-4)[0] #is 1e-4 a good theshold here?
                     invft_c = np.zeros(3, float)
-                    invft_c[whereft] = 1. / ft_c[whereft]
+                    invft_c[whereft] = (1. / ft_c[whereft]) * 6
                     invft_rounded_c = np.rint(invft_c)
                     if np.allclose(invft_c, invft_rounded_c, atol=self.tol*100.):
                     #if np.allclose(np.abs(invft%1.0), np.rint(np.abs(invft%1.0)), atol=1e-5):
                         ft_c = np.zeros(3, float)
-                        ft_c[whereft] = 1. / invft_rounded_c[whereft]
+                        ft_c[whereft] = 6. / invft_rounded_c[whereft]
                         ok, a_a = self.check_one_symmetry(spos_ac, op_cc, ft_c, a_ib)
                         if ok:
                             ok_op_scc_ft.append(op_cc)
