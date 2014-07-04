@@ -455,6 +455,19 @@ class Symmetry:
         if nft > 0:
             text('Symmetries present (total): %s' % n)
             text('Symmetries with fractional translations: %s' % nft)
+            
+        ### print more detailed information
+        text('')
+        for s in range(n):
+            text('Symm: %2d' % (s+1))
+            if self.usefractrans_s[s]:
+                for i in range(3):
+                    text('(%2d %2d %2d)  +  (%9.6f)' % 
+                         (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2], self.ft_sc[s][i]))
+            else:
+                for i in range(3):
+                    text('(%2d %2d %2d)' % (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2]))
+        text('')
 
 
 def map_k_points(bzk_kc, U_scc, inversion, comm=None, tol=1e-11):
