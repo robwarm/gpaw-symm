@@ -238,6 +238,13 @@ class PAWTextOutput:
         t(self.wfs.kd.description)
         t(('%d k-point%s in the Irreducible Part of the Brillouin Zone') %
           (nibzkpts, ' s'[1:nibzkpts]))
+        if nibzkpts < 100:
+            t()
+            for k in range(nibzkpts):
+                t('   %12.8f  %12.8f  %12.8f' % 
+                  (self.wfs.kd.ibzk_kc[k][0], self.wfs.kd.ibzk_kc[k][1],
+                   self.wfs.kd.ibzk_kc[k][2]))
+            t()
 
         if self.scf.fixdensity > self.scf.maxiter:
             t('Fixing the initial density')

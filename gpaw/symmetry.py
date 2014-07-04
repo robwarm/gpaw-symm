@@ -459,14 +459,14 @@ class Symmetry:
         ### print more detailed information
         text('')
         for s in range(n):
-            text('Symm: %2d' % (s+1))
+            text('    Symm: %2d' % (s+1))
             if self.usefractrans_s[s]:
                 for i in range(3):
-                    text('(%2d %2d %2d)  +  (%9.6f)' % 
+                    text('    (%2d %2d %2d)  +  (%9.6f)' % 
                          (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2], self.ft_sc[s][i]))
             else:
                 for i in range(3):
-                    text('(%2d %2d %2d)' % (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2]))
+                    text('    (%2d %2d %2d)' % (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2]))
         text('')
 
 
