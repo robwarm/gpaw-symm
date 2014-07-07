@@ -11,7 +11,7 @@ that the symmetry part is a subclass of kpt_descriptor... not good for us.
 
 IMPORTANT ISSUES:
 
-- PW mode seems to work ..ish
+- PW mode seems to work. Differences can occur low cut-off energies, but that is probably not a bug.
 
 - LCAO did not work for quartz, but perfectly for stishovite... weird
 
