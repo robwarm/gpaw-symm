@@ -184,6 +184,7 @@ class Symmetry:
                     # To ensure this, we only accept fractional translations,
                     # which are rational, eg. 1/2, 1/3 etc
                     # multiply by 6, so that 2/3, 2/5, 3/5 etc work as well
+                    #ft_c = np.where(np.abs(ft_c)-ft_c > 1e-8, ft_c + 1, ft_c) # test limit to positive translations
                     whereft = np.where(np.abs(ft_c) > 1e-4)[0] #is 1e-4 a good theshold here?
                     invft_c = np.zeros(3, float)
                     invft_c[whereft] = (1. / ft_c[whereft]) * 6
@@ -458,6 +459,7 @@ class Symmetry:
             
         ### print more detailed information
         text('')
+        text('    Symmetry matrizes and fractional translations in crystal coord.')
         for s in range(n):
             text('    Symm: %2d' % (s+1))
             if self.usefractrans_s[s]:

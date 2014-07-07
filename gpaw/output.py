@@ -240,10 +240,11 @@ class PAWTextOutput:
           (nibzkpts, ' s'[1:nibzkpts]))
         if nibzkpts < 100:
             t()
+            t('        k-points in crystal coordinates            weights')
             for k in range(nibzkpts):
-                t('   %12.8f  %12.8f  %12.8f' % 
+                t('   %12.8f  %12.8f  %12.8f     %10.6f' % 
                   (self.wfs.kd.ibzk_kc[k][0], self.wfs.kd.ibzk_kc[k][1],
-                   self.wfs.kd.ibzk_kc[k][2]))
+                   self.wfs.kd.ibzk_kc[k][2], self.wfs.kd.weight_k[k]))
             t()
 
         if self.scf.fixdensity > self.scf.maxiter:
