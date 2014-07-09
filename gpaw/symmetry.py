@@ -354,7 +354,6 @@ class Symmetry:
     ### Should not need that one
     #def symmetrize_ft_no(self, a, gd):
         #"""Symmetrize array, excluding fractional translation."""
-        ##print np.where(self.usefractrans_s==False)[0]
         #op_scc = self.op_scc[np.where(self.usefractrans_s==False)[0]]
         #gd.symmetrize(a, op_scc)
 
@@ -450,26 +449,30 @@ class Symmetry:
     def print_symmetries(self, text):
         """Print symmetry information."""
         n = len(self.op_scc)
-        nft = len(np.where(self.usefractrans_s)[0])
-        if nft == 0:
-            text('Symmetries present: %s' % n)
-        if nft > 0:
+        print  self.usefractrans
+        if self.usefractrans:
+            nft = len(np.where(self.usefractrans_s)[0])
             text('Symmetries present (total): %s' % n)
             text('Symmetries with fractional translations: %s' % nft)
-            
-        ### print more detailed information
-        text('')
-        text('    Symmetry matrizes and fractional translations in crystal coord.')
-        for s in range(n):
-            text('    Symm: %2d' % (s+1))
-            if self.usefractrans_s[s]:
+            ### print more detailed information
+            text('')
+            text('    Symmetry matrizes and fractional translations in crystal coord.')
+            for s in range(n):
+                text('    Symm: %2d' % (s+1))
                 for i in range(3):
                     text('    (%2d %2d %2d)  +  (%9.6f)' % 
                          (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2], self.ft_sc[s][i]))
-            else:
+            text('')
+        else:
+            text('Symmetries present: %s' % n)
+            ### print more detailed information
+            text('')
+            text('    Symmetry matrizes in crystal coord.')
+            for s in range(n):
+                text('    Symm: %2d' % (s+1))
                 for i in range(3):
                     text('    (%2d %2d %2d)' % (self.op_scc[s][i][0],self.op_scc[s][i][1],self.op_scc[s][i][2]))
-        text('')
+            text('')
 
 
 def map_k_points(bzk_kc, U_scc, inversion, comm=None, tol=1e-11):
