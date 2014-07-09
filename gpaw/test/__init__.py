@@ -307,6 +307,7 @@ tests = [
     'au02_absorption.py',
     'lrtddft3.py',
     'scfsic_n2.py',
+    'fractional_translations_big.py',
     'parallel/lcao_parallel.py',
     'parallel/lcao_parallel_kpt.py',
     'parallel/fd_parallel.py',
