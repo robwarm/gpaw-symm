@@ -321,9 +321,6 @@ class PAW(PAWTextOutput):
 
         par = self.input_parameters
 
-        ##rbw overwrite usefractrans - for testing only
-        #par.usefractrans = True
-
         world = par.communicator
         if world is None:
             world = mpi.world
@@ -368,6 +365,10 @@ class PAW(PAWTextOutput):
         if mode == 'fd' and par.usefractrans:
             raise NotImplementedError('FD mode does not support '
                                       'fractional translations.')
+        
+        if mode == 'lcao' and par.usefractrans:
+            raise Warning('Fractional translations have not been tested '
+                          'with LCAO mode. Use with care!')
 
         if par.realspace is None:
             realspace = not isinstance(mode, PW)
