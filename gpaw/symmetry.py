@@ -61,8 +61,8 @@ class Symmetry:
         
         self.usefractrans = fractrans
         # disable fractional translations for non-periodic boundary conditions.
-        #  if not all(p == True for p in self.pbc_c):
-        #      self.usefractrans = False
+        if not all(p == True for p in self.pbc_c):
+            self.usefractrans = False
         #      print "Warning: Disabled fractional translations -> pbc"
         
 

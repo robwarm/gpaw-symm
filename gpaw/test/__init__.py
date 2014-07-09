@@ -143,6 +143,7 @@ tests = [
     'gauss_func.py',
     'noncollinear/h.py',
     'symmetry.py',
+    'symmetry_ft.py',
     'usesymm.py',
     'broydenmixer.py',
     'mixer.py',
