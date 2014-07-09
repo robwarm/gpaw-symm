@@ -213,6 +213,7 @@ tests = [
     'excited_state.py',
     # > 20 sec tests start here (add tests after gemm.py!)
     'gemm.py',
+    'fractional_translations.py',
     'rpa_energy_Ni.py',
     'LDA_unstable.py',
     'si.py',
