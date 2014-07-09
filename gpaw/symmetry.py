@@ -449,7 +449,6 @@ class Symmetry:
     def print_symmetries(self, text):
         """Print symmetry information."""
         n = len(self.op_scc)
-        print  self.usefractrans
         if self.usefractrans:
             nft = len(np.where(self.usefractrans_s)[0])
             text('Symmetries present (total): %s' % n)
