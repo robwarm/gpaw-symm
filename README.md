@@ -21,6 +21,7 @@ IMPORTANT NOTES:
 - dfpt and hybrid don't work because they need symmetrize_wavefunction
 - chi.py needs symmetrize_return_index, which is not implemented with fractional translations
 
+- restart won't work I assume, because we have to write stuff manually into the gpw file?
 
 - reponse may not work properly, but I won't fix, because people are working on new version.
 - the following tests will fail with 1 core: chi0.py
