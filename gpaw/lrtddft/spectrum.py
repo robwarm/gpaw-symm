@@ -13,7 +13,8 @@ def spectrum(exlist=None,
              energyunit='eV',
              folding='Gauss',
              width=0.08, # Gauss/Lorentz width
-             comment=None
+             comment=None,
+             form='r'
              ):
     """Write out a folded spectrum.
 
@@ -43,6 +44,11 @@ def spectrum(exlist=None,
     if folding is not None: # fold the spectrum
         print >> out, '# %s folded, width=%g [%s]' % (folding, width, 
                                                       energyunit)
+    if form == 'r':
+        out.write('# length form')
+    else:
+        assert(form == 'v')
+        out.write('# velocity form')
     print >> out,\
         '# om [%s]     osz          osz x       osz y       osz z'\
         % energyunit
@@ -51,7 +57,7 @@ def spectrum(exlist=None,
     y = []
     for ex in exlist:
         x.append(ex.get_energy() * Hartree)
-        y.append(ex.get_oscillator_strength())
+        y.append(ex.get_oscillator_strength(form))
 
     if energyunit == 'nm':
         # transform to experimentally used wavelength [nm]

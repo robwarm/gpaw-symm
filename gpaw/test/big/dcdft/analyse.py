@@ -10,16 +10,48 @@ import zipfile
 
 import csv
 
+import numpy as np
+
 from ase.test import NotAvailable
 
 from ase import units
 
 from ase.test.tasks.dcdft import DeltaCodesDFTTask as Task
 
+dir = 'Delta'
+
 if len(sys.argv) == 1:
     tag = None
+    reffile = os.path.join(dir, 'WIEN2k.txt')
 else:
-    tag = sys.argv[1]
+    if len(sys.argv) == 3:
+        tag = sys.argv[1]
+        reffile = sys.argv[2]
+    else:
+        tag = sys.argv[1]
+        reffile = os.path.join(dir, 'WIEN2k.txt')
+
+src = 'https://molmod.ugent.be/sites/default/files/Delta_v3-0_0.zip'
+name = os.path.basename(src)
+if not os.path.exists(dir): os.makedirs(dir)
+os.chdir(dir)
+if not os.path.exists('calcDelta.py'):
+    try:
+        resp = urllib2.urlopen(src)
+        urllib.urlretrieve(src, filename=name)
+        z = zipfile.ZipFile(name)
+        try:  # new in 2.6
+            z.extractall()
+        except AttributeError:
+            # http://stackoverflow.com/questions/7806563/how-to-unzip-a-zip-file-with-python-2-4
+            for f in z.namelist():
+                fd = open(f, "w")
+                fd.write(z.read(f))
+                fd.close()
+        # AttributeError if unzip not found
+    except (urllib2.HTTPError, AttributeError):
+        raise NotAvailable('Retrieval of zip failed')
+os.chdir('..')
 
 task = Task(
     tag=tag,
@@ -68,12 +100,23 @@ csvwriter2 = csv.writer(open('%s.csv' % tag, 'wb'))
 h2 = h + ['%' + h[1], '%' + h[2], '%' + h[3]]
 csvwriter2.writerow(h2)
 
+refs = np.loadtxt(reffile,
+                  dtype={'names': ('element', 'V0', 'B0', 'BP'),
+                         'formats': ('S2', np.float, np.float, np.float)})
+# convert into dict
+refsd = {}
+for e, v, b0, b1 in refs:
+    refsd[e] = [v, b0, b1]
+
 rows = []
 rowserr = []
 for n in task.collection.names:
     row = [n]
     if n in data.keys():
-        ref = task.collection.ref[n]
+        if 0:
+            ref = task.collection.ref[n]  # don't use collection data
+        else:
+            ref = refsd[n]
         try:
             v = round(data[n]['dcdft volume'], 3)
             b0 = round(data[n]['dcdft B0'], 3)
@@ -93,37 +136,13 @@ for n in task.collection.names:
         #print row + ref + [ve, b0e, b1e]
         csvwriter2.writerow(row + [ve, b0e, b1e])
 
-if 1:
-    # download and create the project databases
-    src = 'https://molmod.ugent.be/sites/default/files/Delta_v3-0_0.zip'
-    name = os.path.basename(src)
-    dir = 'Delta'
-    if not os.path.exists(dir): os.makedirs(dir)
-    os.chdir(dir)
-    try:
-        resp = urllib2.urlopen(src)
-        urllib.urlretrieve(src, filename=name)
-        z = zipfile.ZipFile(name)
-        try:  # new in 2.6
-            z.extractall()
-        except AttributeError:
-            # http://stackoverflow.com/questions/7806563/how-to-unzip-a-zip-file-with-python-2-4
-            for f in z.namelist():
-                fd = open(f, "w")
-                fd.write(z.read(f))
-                fd.close()
-        # AttributeError if unzip not found
-    except (urllib2.HTTPError, AttributeError):
-        raise NotAvailable('Retrieval of zip failed')
-    os.chdir('..')
-
-    # calculate Delta
-    f = open('%s.txt' % tag, 'wb')
-    csvwriter3 = csv.writer(f, delimiter='\t')
-    for r in rows:
-        csvwriter3.writerow(r)
-    f.close()
-    cmd = 'python ' + os.path.join(dir, 'calcDelta.py')
-    cmd += ' ' + '%s.txt ' % tag + os.path.join(dir, 'WIEN2k.txt') + ' --stdout'
-    cmd += ' > ' + '%s_Delta.txt' % tag
-    os.system(cmd)
+# calculate Delta
+f = open('%s.txt' % tag, 'wb')
+csvwriter3 = csv.writer(f, delimiter='\t')
+for r in rows:
+    csvwriter3.writerow(r)
+f.close()
+cmd = 'python ' + os.path.join(dir, 'calcDelta.py')
+cmd += ' ' + '%s.txt ' % tag + reffile + ' --stdout'
+cmd += ' > ' + '%s_Delta.txt' % tag
+os.system(cmd)

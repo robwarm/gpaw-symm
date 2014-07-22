@@ -182,6 +182,36 @@ Plane-waves:
         calc = GPAW(mode=PW(200))
 
 
+Comparing FD, LCAO and PW modes
+```````````````````````````````
+    
+Memory consumption:
+    With LCAO, you have fewer degrees of freedom so memory usage is low.
+    PW mode uses more memory and FD a lot more.
+    
+Speed:
+    For small systems with many **k**-points, PW mode beats everything else.
+    For larger systems LCAO will be most efficient.  Whereas PW beats FD for
+    smallish systems, the opposite is true for very large systems where FD
+    will parallelize better.
+    
+Absolute convergence:
+    With LCAO, it can be hard to reach complete basis set limit and get
+    absolute convergence of energies, whereas with FD and PW mode it is
+    quite easy to do by decreasing the grid spacing or increasing the
+    plane-wave cutoff energy, respectively.
+    
+Eggbox errors:
+    With LCAO and FD mode you will get a small eggbox error: you get a
+    small periodic energy variation as you translate atoms and the period
+    of the variation will be equal to the grid-spacing used.  GPAW's PW
+    implementation doesn't have this problem.
+
+Features:
+    FD mode is the oldest and has most features.  Only PW mode can be used
+    for calculating the stress-tensor and for response function calculations.
+    
+    
 .. _manual_nbands:
 
 Number of electronic bands
@@ -579,9 +609,9 @@ There exist three special names, that if used, does not specify a file name:
 
 * ``'ae'`` is used for specifying all-electron mode for an
   atom. I.e. no PAW or pseudo potential is used.
-* ``'hgh'`` is used to specify a norm-conserving Hartwigsen-Goedecker-Hutter
-  pseudopotential (no file necessary).  Some elements have better
-  semicore pseudopotentials.  To use those, specify ``'hgh.sc'``
+* ``'hgh'`` is used to specify a norm-conserving Hartwigsen-Goedecker-Hutter 
+  pseudopotential (no file necessary).  Some elements have better 
+  semicore pseudopotentials.  To use those, specify ``'hgh.sc'`` 
   for the elements or atoms in question.
 * ``'ghost'`` is used to indicated a *ghost* atom in LCAO mode, 
   see :ref:`ghost-atoms`. 

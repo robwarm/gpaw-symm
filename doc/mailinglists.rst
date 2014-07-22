@@ -49,4 +49,4 @@ Logs from the IRC channel:
 
 * irc-logs_
 
-.. _irc-logs: http://dcwww.fys.dtu.dk/~s052580/irclogs/gpaw
+.. _irc-logs: http://dcwww.fys.dtu.dk/~jensj/gpaw-stuff

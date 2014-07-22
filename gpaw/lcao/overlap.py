@@ -709,7 +709,8 @@ class NewTwoCenterIntegrals:
                                                                 True))
         self.atoms = self.atompairs.pairs.atoms # XXX compatibility
 
-        cutoff_close_a = [covalent_radii[s.Z] / Bohr / 2. for s in setups]
+        scale = 0.01 # XXX minimal distance scale
+        cutoff_close_a = [covalent_radii[s.Z] / Bohr * scale for s in setups]
         self.atoms_close = NeighborPairs(cutoff_close_a, cell_cv, pbc_c, False)
 
         rcmax = max(cutoff_I + [0.001])

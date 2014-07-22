@@ -29,7 +29,7 @@ one implemented in GPAW. Thus, the DFT+U totally energy in GPAW is:
     \sum_a \frac{U_\text{eff}}{2}
     \text{Tr}(\rho^a - \rho^a \rho^a),
 
-where `rho^a` is the atomic orbital occupation matrix. This can be
+where `\rho^a` is the atomic orbital occupation matrix. This can be
 understood as adding a penalty functional to the DFT total energy
 expression that forces the on site occupancy matrix in the direction
 of idempotency, i.e. to either fully occupied or fully unoccupied

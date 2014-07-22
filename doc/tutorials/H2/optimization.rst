@@ -14,7 +14,7 @@ eV/Å.  The following script will do the job:
 
 .. literalinclude:: relax.py
 
-The result is::
+The result is:
 
 .. literalinclude:: optimization.txt
 

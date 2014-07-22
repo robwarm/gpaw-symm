@@ -21,12 +21,12 @@ import _gpaw
 
 
 class PoissonSolver:
-    def __init__(self, nn=3, relax='J', eps=2e-10):
+    def __init__(self, nn=3, relax='J', eps=2e-10, maxiter=1000):
         self.relax = relax
         self.nn = nn
         self.eps = eps
         self.charged_periodic_correction = None
-        self.maxiter = 1000
+        self.maxiter = maxiter
 
         # Relaxation method
         if relax == 'GS':

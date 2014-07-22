@@ -4,8 +4,7 @@
 Convergence Issues
 ==================
 
-*Try to use default parameters for the calculator. Simple but
-sometimes useful.*
+*Try to use default parameters for the calculator. Simple and often useful.*
 
 Here you find a list of suggestions that should be considered when
 encountering convergence problems:
@@ -15,7 +14,8 @@ encountering convergence problems:
    Remember that ASE uses Angstrom and not Bohr or nm!
    For spin polarized systems, make sure you have sensible initial magnetic
    moments. Don't do spin-paired calculations for molecules with an odd
-   number of electrons.
+   number of electrons. Before performing calculations of isolated atoms
+   see :ref:`atomization_energy`.
 
 2) Use less aggressive density mixing.
 
@@ -84,4 +84,7 @@ encountering convergence problems:
    the latest PAW datasets. You can also try to make a better initial guess
    by enlarging the :ref:`manual_basis`. Note that you first need to generate
    the basis file, as described in :ref:`LCAO mode <lcao>`. 
+
+   Warning: this may in some cases worsen the convergence, and improves
+   it usually only when the number of empty states is significantly increased.
  

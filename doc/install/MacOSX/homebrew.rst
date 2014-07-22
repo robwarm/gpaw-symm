@@ -125,15 +125,15 @@ install http://xquartz.macosforge.org, reboot, and additionally::
 
   brew install pygtk
 
-Configure a virtualenv for ASE, e.g. 3.6.0.2515 release::
+Configure a virtualenv for the latest stable release of ASE::
 
   cd ~/Virtualenvs
-  virtualenv ase-3.6.0.2515 && cd ase-3.6.0.2515
+  virtualenv ase && cd ase
   . bin/activate
 
 Now, install ASE inside of virtualenv::
 
-  pip install python-ase==3.6.0.2515
+  pip install python-ase
   pip install numpy
 
 Make sure the PKG_CONFIG_PATH correctly
@@ -141,4 +141,8 @@ https://github.com/mxcl/homebrew/issues/16891
 and then, again inside of virtualenv::
 
   pip install python-dateutil  # OS X version is outdated!
-  pip install matplotlib
+
+The latest, precompiled versions of matplotlib (1.3.1) are missing
+backend_gdk.so, and therefore compile an older version::
+
+  pip install matplotlib==1.1.1

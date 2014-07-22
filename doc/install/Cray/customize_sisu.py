@@ -2,8 +2,12 @@ extra_compile_args = ['-std=c99', '-O3']
 compiler = 'cc'
 mpicompiler = 'cc'
 mpilinker= 'cc'
-libraries = []
-extra_link_args += ['-dynamic']
+# edit library and include paths for libxc
+include_dirs += ['/homeappl/home/jenkovaa/libxc/sisu/gcc/include']
+library_dirs = ['/homeappl/home/jenkovaa/libxc/sisu/gcc/lib']
+
+
+libraries = ['z', 'xc']
 
 scalapack = True
 hdf5 = True

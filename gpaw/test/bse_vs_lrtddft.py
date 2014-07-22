@@ -39,7 +39,8 @@ if bse:
     bse.diagonalize(H_SS)
     
     w = np.real(bse.w_S) * Hartree
-    energies = np.sort(w[:,np.nonzero(w>0)[0]])
+    print np.shape(w)
+    energies = np.sort(w)[len(w)/2:]
     print 'BSE:', energies
 
 if casida:
