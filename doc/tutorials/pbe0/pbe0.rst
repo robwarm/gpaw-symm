@@ -7,7 +7,7 @@ PBE0 calculations for bulk silicon
 .. seealso::
 
    * :ref:`bandstructures` tutorial.
-   * :ref:`band_exercise` exercice.
+   * :ref:`band exercise` exercice.
 
 
 PBE band structure

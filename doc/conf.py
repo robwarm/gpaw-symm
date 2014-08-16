@@ -32,7 +32,7 @@ except ImportError:
 
 
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['ext', 'images', 'sitelink',
+extensions = ['ytp', 'ext', 'images', 'sitelink',
               'sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               ext_png_math]
@@ -197,7 +197,9 @@ latex_preamble = '\usepackage{amsmath}\usepackage{amsfonts}'
 #latex_use_modindex = True
 
 # Example configuration for intersphinx: refer to ase.
-intersphinx_mapping = {'http://wiki.fysik.dtu.dk/ase': None}
+intersphinx_mapping = {'http://wiki.fysik.dtu.dk/ase': None,
+                       'http://docs.scipy.org/doc/numpy': None,
+                       'http://docs.enthought.com/mayavi/mayavi': None}
 
 # sphinx.ext.pngmath manual configuration
 # ---------------------------------------

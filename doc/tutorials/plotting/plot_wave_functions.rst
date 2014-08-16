@@ -26,10 +26,22 @@ The script produced the files CO_0.cube .. CO_5.cube, which might be viewed usin
 Plotting wave functions with jmol
 ---------------------------------
 
-To be written! See for example http://jmol.sourceforge.net/docs/surface/ and 
-http://www.tcm.phy.cam.ac.uk/~mjr/vis/vis_jmol.html .
-Anynone familiar with jmol scripts? Please send us an example.
+See http://jmol.sourceforge.net/docs/surface/
 
+You can visualize an isosurface from a cube file by creating the
+myscript.spt script::
+  
+   #isosurface name cutoff "cubefile"
+   isosurface pos 0.05 "CO_1.cube"
+
+and executing it with jmol::
+
+   jmol -s myscript.spt
+
+You can also save the image directly on the command line::
+
+   jmol -ions myscript.spt -w JPEG:myfile.jpg
+  
 Plotting wave functions with VMD
 --------------------------------
 

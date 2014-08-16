@@ -96,6 +96,4 @@ Run the :svn:`~doc/exercises/surface/work_function.py`
 script and estimate the work function for a Al(100) surface (this
 script does not run in parallel). A typical
 experimental value for the work function of the Al(100) surface is
-4.20 eV. You may try to improve the result by adding more vacuum to the 
-slab calculation.
-
+4.20 eV. 

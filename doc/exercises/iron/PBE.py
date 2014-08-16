@@ -1,6 +1,6 @@
 from gpaw import GPAW
 
-print 'state    LDA        PBE'
+print('state    LDA        PBE')
 
 for name in ['ferro', 'anti', 'non']:
 
@@ -11,9 +11,9 @@ for name in ['ferro', 'anti', 'non']:
     ePBE = eLDA + deltaxc
     
     if name == 'ferro':
-        eLDA0 = eLDA 
+        eLDA0 = eLDA
         ePBE0 = ePBE
         
     eLDA -= eLDA0
     ePBE -= ePBE0
-    print '%-5s: %7.3f eV %7.3f eV' % (name, eLDA, ePBE)
+    print('%-5s: %7.3f eV %7.3f eV' % (name, eLDA, ePBE))

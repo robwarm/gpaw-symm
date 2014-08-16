@@ -13,7 +13,7 @@ from gpaw.atom.basis import BasisMaker
 from gpaw import GPAW, FermiDirac
 from gpaw.mpi import serial_comm, rank, size
 from gpaw.utilities import devnull
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 
 
 if rank != 0:

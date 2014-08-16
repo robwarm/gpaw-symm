@@ -14,7 +14,7 @@ from ase.parallel import paropen
 from gpaw import GPAW
 from gpaw.mpi import rank
 from gpaw.mixer import Mixer
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 from gpaw.utilities import devnull
 
 

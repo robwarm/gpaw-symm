@@ -4,12 +4,10 @@
 Bulk aluminum
 =============
 
-Now we are ready to run the first GPAW calculation. We will look at
-bulk fcc aluminum and make a single energy calculation at the
-experimental lattice constant `a_0` = 4.05 Å. For the first example,
-we choose 0.2 Å as grid spacing and 4 x 4 x 4 **k**-points.  Copy this
-:svn:`~doc/exercises/aluminium/Al_fcc.py` to a
-place in your file area:
+We will look at bulk fcc aluminum and make a single energy calculation at the
+experimental lattice constant `a_0` = 4.05 Å. For the first example, we
+choose a plane-wave cutoff energy of 300 eV and 4 x 4 x 4 **k**-points.  Copy
+this :download:`Al_fcc.py` to a place in your file area:
 
 .. literalinclude:: Al_fcc.py
 
@@ -21,16 +19,14 @@ script by typing::
   $ python Al_fcc.py
 
 The program will pop up a window showing the bulk structure.  Verify
-that the structure indeed is fcc. Try to identify the closepacked
-(111) planes.
+that the structure indeed is fcc. Try to identify the closepacked (111)
+planes.  In :program:`ase-gui` this is done by choosing :menuselection:`View
+--> Repeat`.
 
 Notice that the program has generated two output files::
 
   Al-fcc.gpw
   Al-fcc.txt
-
-Typically, when you execute a GPAW electronic structure calculation,
-you get two files:
 
 * A tar-file (conventional suffix :file:`.gpw`) containing binary data
   such as eigenvalues, electron density and wave functions (see
@@ -40,9 +36,8 @@ you get two files:
   monitors the progress of the calculation.
 
 Try to take a look at the file :file:`Al-fcc.txt`.  Find the number of
-grid points used - it should be 12x12x12 points.  You can conveniently
-monitor some variables by using the :command:`grep` utility.  By
-typing::
+plane-waves used.  You can conveniently monitor some variables by using the
+:command:`grep` utility.  By typing::
 
   $ grep iter Al-fcc.txt
 
@@ -53,19 +48,22 @@ the log output will be printed directly in the terminal.
 .. highlight:: python
 
 The binary file contains all information about the calculation. Try
-typing the following from the Python interpreter::
+typing the following from the Python interpreter:
 
-  >>> from gpaw import GPAW
-  >>> calc = GPAW('Al-fcc.gpw')
-  >>> bulk = calc.get_atoms()
-  >>> print bulk.get_potential_energy()
-  >>> density = calc.get_pseudo_density()
-  >>> from ase.io import write
-  >>> write('Al.cube', bulk, data=density)
-  >>> [hit CTRL-d]
-  $ vmd Al.cube
-
-Try to make :program:`VMD` show an isosurface of the electron density.
+>>> from gpaw import GPAW
+>>> calc = GPAW('Al-fcc.gpw', txt=None)
+>>> bulk = calc.get_atoms()
+>>> print bulk.get_potential_energy()
+-4.12234332252
+>>> density = calc.get_pseudo_density()
+>>> density.shape
+(9, 9, 9)
+>>> density.max()
+0.42718359271458561
+>>> from mayavi import mlab
+>>> mlab.contour3d(density)
+<mayavi.modules.iso_surface.IsoSurface object at 0x7f1194491110>
+>>> mlab.show()
 
 
 Equilibrium lattice properties
@@ -81,7 +79,7 @@ bulk Aluminum.
 
   .. hint::
 
-     Modify :svn:`~doc/exercises/aluminium/Al_fcc.py` by adding a
+     Modify :download:`Al_fcc.py` by adding a
      for-loop like this::
 
          for a in [3.9, 4.0, 4.1, 4.2]:
@@ -90,9 +88,7 @@ bulk Aluminum.
      and then indent the rest of the code by
      four spaces (Python uses indentation to group statements together
      - thus the for-loop will end at the first unindented line).
-     Remove the ``view(bulk)`` line and change ``h=0.2`` to
-     ``gpts=12,12,12`` so that we are sure that 12x12x12 grid points
-     will be used for all lattice constants.
+     Remove the ``view(bulk)`` line.
 
 * Fit the data you have obtained to get `a_0` and the energy curve
   minimum `E_0=E(a_0)`.  From your fit, calculate the bulk
@@ -101,9 +97,8 @@ bulk Aluminum.
   .. math:: B = V\frac{d^2 E}{dV^2} = \frac{M}{9a_0}\frac{d^2 E}{da^2},
 
   where *M* is the number of atoms per cubic unit cell:
-  `V=Ma^3` (`M=4` for fcc).  Make the fit using your favorite math
-  package (SciPy/Mathematica/MatLab/Maple/...) or use :program:`ase-gui`
-  like this::
+  `V=a^3/M` (`M=4` for fcc).  Make the fit using your favorite math
+  package (NumPy_) or use :program:`ase-gui` like this::
 
     $ ase-gui bulk-*.txt
 
@@ -120,11 +115,15 @@ bulk Aluminum.
 
   .. note::
 
-     The LDA reference values are: `a_0` = 3.98 Å and `B` = 84.0 GPa -
-     see S. Kurth *et al.*, Int. J. Quant. Chem. **75** 889-909
-     (1999).
+      The LDA reference values are: `a_0` = 3.98 Å and `B` = 84.0 GPa -
+      see S. Kurth *et al.*, Int. J. Quant. Chem. **75** 889-909
+      (1999).
 
+.. _NumPy: http://docs.scipy.org/doc/numpy/reference/generated/
+    numpy.polynomial.polynomial.Polynomial.html
+    #numpy-polynomial-polynomial-polynomial
 
+    
 Convergence in number of **k**-points
 -------------------------------------
 
@@ -136,9 +135,8 @@ fcc Aluminum; this is a standard first step in all DFT calculations.
 
   .. hint::
 
-     You may want to speed up these calculations by running them in
-     parallel.  Use ``parallel={'domain': 1}`` to force
-     parallelization over **k**-points.
+      You may want to speed up these calculations by running them in
+      parallel.
 
 * Estimate the necessary number of **k**-points for achieving an
   accurate value for the lattice constant.
@@ -150,8 +148,7 @@ fcc Aluminum; this is a standard first step in all DFT calculations.
 Equilibrium lattice properties for bcc
 ======================================
 
-* Set up a similar calculation for bcc, in the minimal unit cell. Note that 
-  the cubic unit cell for a bcc lattice only contains two atoms.
+* Set up a similar calculation for bcc, in the minimal unit cell.
   
 * Make a qualified starting guess on `a_\text{bcc}` from the lattice
   constant for fcc, that you have determined above. One can either
@@ -161,9 +158,7 @@ Equilibrium lattice properties for bcc
   assumptions. Later, you can comment on which assumption gives the
   guess closer to the right lattice constant.
 
-* Check that your structure is right by repeating the unit cell. In
-  :program:`ase-gui` this
-  is done by choosing :menuselection:`View --> Repeat`.
+* Check that your structure is right by repeating the unit cell.
 
 * Map out the cohesive curve `E(a)` for Al(bcc) and determine
   `a_\text{bcc}`, using a few points.  Is it a good idea to use the
@@ -177,5 +172,4 @@ Equilibrium lattice properties for bcc
   :ref:`zero_energy`).  This exercise is sensitive to the number of
   **k**-points, make sure that your **k**-point sampling is dense
   enough.  Also make sure your energies are converged with respect to
-  the number of grid points used (see the :ref:`Water
-  <convergence_checks>` exercise).
+  the plane-wave cutoff energy.

@@ -12,19 +12,17 @@ The numbers are compared to:
   DOI: 10.1103/PhysRevB.81.195117
 """
 
-import pickle
-
-import numpy as np
+import ase.db
 from ase.lattice import bulk
 from ase.dft.kpoints import monkhorst_pack
 
-from gpaw.mpi import rank
 from gpaw import GPAW, PW
+from gpaw.xc.exx import EXX
 from gpaw.xc.tools import vxc
-from gpaw.xc.hybridg import HybridXC
 
 
-data = {
+# Data from Betzinger, Friedrich and Blügel:
+bfb = {
     'Si': ['diamond', 5.421,
            2.56, 3.96, 2.57, 3.97,
            0.71, 1.93, 0.71, 1.93,
@@ -51,10 +49,14 @@ data = {
 nk = 12
 kpts = monkhorst_pack((nk, nk, nk)) + 0.5 / nk
 
-results = np.empty((16, 6))
-i = 0
+c = ase.db.connect('gaps.db')
+
 for name in ['Si', 'C', 'GaAs', 'MgO', 'NaCl', 'Ar']:
-    x, a = data[name][:2]
+    id = c.reserve(name=name)
+    if id is None:
+        continue
+        
+    x, a = bfb[name][:2]
     atoms = bulk(name, x, a=a)
     atoms.calc = GPAW(xc='PBE',
                       mode=PW(500),
@@ -63,31 +65,40 @@ for name in ['Si', 'C', 'GaAs', 'MgO', 'NaCl', 'Ar']:
                       convergence=dict(bands=-7),
                       kpts=kpts,
                       txt='%s.txt' % name)
+    
     if name in ['MgO', 'NaCl']:
-        atoms.calc.set(eigensolver='cg')
+        atoms.calc.set(eigensolver='dav')
+
     atoms.get_potential_energy()
-    pbe0 = HybridXC('PBE0', alpha=5.0, bandstructure=True)
-    de_skn = vxc(atoms.calc, pbe0) - vxc(atoms.calc, 'PBE')
+    atoms.calc.write(name, mode='all')
+    
     ibzk_kc = atoms.calc.get_ibz_k_points()
     n = int(atoms.calc.get_number_of_electrons()) // 2
-    gamma = None
-    j = 0
-    for symbol, k_c in zip('GXL', [(0, 0, 0), (0.5, 0.5, 0), (0.5, 0.5, 0.5)]):
+    
+    ibzk = []
+    eps_kn = []
+    for k_c in [(0, 0, 0), (0.5, 0.5, 0), (0.5, 0.5, 0.5)]:
         k = abs(ibzk_kc - k_c).max(1).argmin()
-        if gamma is None:
-            gamma = atoms.calc.get_eigenvalues(k)[n - 1]
-            gamma0 = gamma + de_skn[0, k, n - 1]
-        e = atoms.calc.get_eigenvalues(k)[n]
-        e0 = e + de_skn[0, k, n]
-        if rank == 0:
-            print(name, n, k, symbol, e - gamma, e0 - gamma0)
-        results[i][:2] = [e - gamma, e0 - gamma0]
-        results[i][2:] = data[name][2 + j * 4:6 + j * 4]
-        i += 1
-        j += 1
+        ibzk.append(k)
+        eps_kn.append(atoms.calc.get_eigenvalues(k)[n - 1:n + 1])
         if name == 'Ar':
             break
+
+    deps_kn = vxc(atoms.calc, 'PBE')[0, ibzk, n - 1:n + 1]
         
-if rank == 0:
-    print(results)
-    pickle.dump(results, open('results.pckl', 'w'))
+    pbe0 = EXX(name, 'PBE0', ibzk, (n - 1, n + 1), txt=name + '.exx')
+    pbe0.calculate()
+    deps0_kn = pbe0.get_eigenvalue_contributions()[0]
+
+    eps0_kn = eps_kn - deps_kn + deps0_kn
+
+    data = {}
+    for k, point in enumerate('GXL'):
+        data[point] = [eps_kn[k][1] - eps_kn[0][0],
+                       eps0_kn[k, 1] - eps0_kn[0, 0]]
+        data[point] += bfb[name][2 + k * 4:6 + k * 4]
+        if name == 'Ar':
+            break
+            
+    c.write(atoms, name=name, data=data)
+    del c[id]

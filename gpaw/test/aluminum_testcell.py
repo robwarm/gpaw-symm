@@ -9,7 +9,7 @@ from ase.lattice import bulk
 from gpaw import GPAW
 from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.atom.basis import BasisMaker
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 from gpaw.mixer import Mixer
 from gpaw.mpi import serial_comm, rank, size
 from gpaw.utilities import devnull

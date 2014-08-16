@@ -1,56 +1,44 @@
-"""Bulk Al(bcc) test"""
+from __future__ import division, print_function
+from numpy.polynomial import Polynomial
+import ase.units as u
+from ase.lattice import bulk
+from gpaw import GPAW, PW
 
-from math import sqrt
+afcc = 3.985             # Theoretical fcc lattice parameter
+a = afcc * 2**(-1 / 3)   # Assuming the same volume per atom
+a = afcc * (2 / 3)**0.5  # Assuming the same nearest neighbor distance
 
-from ase import Atoms
-from ase.visualize import view
-from gpaw import GPAW
-
-afcc = 3.985          # Theoretical fcc lattice parameter
-a = afcc * 2**(-1/3.) # Assuming the same volume per atom
-a = afcc * sqrt(2/3.) # Assuming the same nearest neighbor distance
-
-bulk = Atoms(symbols='2Al',
-             positions=[(0, 0, 0),
-                        (.5, .5, .5)],
-              pbc=True)
-
-bulk.set_cell((a, a, a), scale_atoms=True)
-
-# View 3x3x3 repeated structure
-view(bulk * [3, 3, 3])
-
-calc = GPAW(nbands=8)
-bulk.set_calculator(calc)
+bcc = bulk('Al', 'bcc', a=a)
+bcc.calc = GPAW()
 
 # Convergence with respect to k-points:
-calc.set(h=.25, txt='Al-fcc-k.txt')
+bcc.calc.set(mode=PW(300), txt='Al-bcc-k.txt')
 
 for k in [4, 6, 8, 10]: 
-    calc.set(kpts=(k, k, k))
-    print k, bulk.get_potential_energy() 
+    bcc.calc.set(kpts=(k, k, k))
+    print(k, bcc.get_potential_energy())
 
 # Convergence with respect to grid spacing:
-calc.set(kpts=(8, 8, 8), txt='Al-bcc-h.txt')
+bcc.calc.set(kpts=(8, 8, 8), txt='Al-bcc-ecut.txt')
 
-for g in [12, 16, 20]:
-    h = a / g
-    calc.set(h=h)
-    print h, bulk.get_potential_energy() 
+for ecut in [200, 300, 400, 500]:
+    bcc.calc.set(mode=PW(ecut))
+    print(ecut, bcc.get_potential_energy())
 
 # Set parameters to reasonably converged values
-calc.set(h=.28, kpts=(8, 8, 8))
-for a in [3.0, 3.1, 3.2, 3.3]:
-    calc.set(txt='bulk-bcc-a%.1f.txt' % a)
-    bulk.set_cell((a, a, a), scale_atoms=True)
-    print a, bulk.get_potential_energy()
+E = []
+A = [3.0, 3.1, 3.2, 3.3]
+for a in A:
+    bcc = bulk('Al', 'bcc', a=a)
+    bcc.calc = GPAW(mode=PW(300),
+                    kpts=(8, 8, 8),
+                    txt='bulk-bcc-a%.1f.txt' % a)
+    E.append(bcc.get_potential_energy())
 
-# run: ag bulk-bcc*.txt
-# Choose 'Tools -> Bulk Modulus' to get
+p = Polynomial.fit(A, E, 3)
+a0 = p.deriv(1).roots()[0]
+B = p.deriv(2)(a0) * 2 / 9 / a0 / u.J * u.m**3 * 1e-9  # GPa
+print(a0, B)
 
-# B = 74.633 GPa, and
-# V = 32.472 A^3 <=> a = 3.190
-
-# To be compared to the fcc values:
-# B = 85.823 GPa, and
-# V = 63.270 A^3 <=> a = 3.985
+assert abs(a0 - 3.1969) < 0.001
+assert abs(B - 77.5) < 0.1

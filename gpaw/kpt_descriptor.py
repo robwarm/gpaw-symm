@@ -114,7 +114,7 @@ class KPointDescriptor:
         
         # Gamma-point calculation?
         self.usefractrans = usefractrans
-        self.gamma = self.nbzkpts == 1 and not self.bzk_kc[0].any()
+        self.gamma = (self.nbzkpts == 1 and np.allclose(self.bzk_kc[0], 0.0))
         self.set_symmetry(None, None, usesymm=None)
         self.set_communicator(mpi.serial_comm)
 
@@ -157,8 +157,9 @@ class KPointDescriptor:
         """
 
         if atoms is not None:
-            if (~atoms.pbc & self.bzk_kc.any(0)).any():
-                raise ValueError('K-points can only be used with PBCs!')
+            for c, periodic in enumerate(atoms.pbc):
+                if not periodic and not np.allclose(self.bzk_kc[:, c], 0.0):
+                    raise ValueError('K-points can only be used with PBCs!')
 
             self.cell_cv = atoms.cell / Bohr
      
@@ -362,7 +363,6 @@ class KPointDescriptor:
             else:
                 return b_g
 
-
     def get_transform_wavefunction_index(self, nG, k):
         """Get the "wavefunction transform index".
 
@@ -448,14 +448,15 @@ class KPointDescriptor:
                 identity_iop = i
                 break
 
-        ibzq_q_tmp ={}
+        ibzq_q_tmp = {}
         iop_q = {}
         timerev_q = {}
         diff_qc = {}
 
-        for i in range(len(bzq_qc)-1,-1,-1): #  loop opposite to kpoint
+        for i in range(len(bzq_qc) - 1, -1, -1):  # loop opposite to kpoint
             try:
-                ibzk, iop, timerev, diff_c = self.find_ibzkpt(op_scc, ibzq_qc_tmp, bzq_qc[i])
+                ibzk, iop, timerev, diff_c = self.find_ibzkpt(
+                    op_scc, ibzq_qc_tmp, bzq_qc[i])
                 find = False
                 for ii, iop1 in enumerate(self.sym_k):
                     if iop1 == iop and self.time_reversal_k[ii] == timerev:
@@ -468,7 +469,7 @@ class KPointDescriptor:
                 weight_tmp[ibzk] += 1.
                 iop_q[i] = iop
                 timerev_q[i] = timerev
-                diff_qc[i] = diff_c                
+                diff_qc[i] = diff_c
             except ValueError:
                 ibzq_qc_tmp.append(bzq_qc[i])
                 weight_tmp.append(1.)
@@ -479,18 +480,17 @@ class KPointDescriptor:
 
         # reverse the order.
         nq = len(ibzq_qc_tmp)
-        ibzq_qc = np.zeros((nq,3))
-        ibzq_q = np.zeros(len(bzq_qc),dtype=int)
+        ibzq_qc = np.zeros((nq, 3))
+        ibzq_q = np.zeros(len(bzq_qc), dtype=int)
         for i in range(nq):
-            ibzq_qc[i] = ibzq_qc_tmp[nq-i-1]
+            ibzq_qc[i] = ibzq_qc_tmp[nq - i - 1]
         for i in range(len(bzq_qc)):
             ibzq_q[i] = nq - ibzq_q_tmp[i] - 1
         self.q_weights = np.array(weight_tmp[::-1]) / len(bzq_qc)
         return ibzq_qc, ibzq_q, iop_q, timerev_q, diff_qc
 
-
     def find_ibzkpt(self, symrel, ibzk_kc, bzk_c):
-        """Given a certain kpoint, find its index in IBZ and related symmetry operations."""
+        """Find index in IBZ and related symmetry operations."""
         find = False
         ibzkpt = 0
         iop = 0
@@ -512,10 +512,9 @@ class KPointDescriptor:
             if find == True:
                 break
 
-        if find == False:        
-            raise ValueError('Cant find corresponding IBZ kpoint!')    
+        if find == False:
+            raise ValueError('Cant find corresponding IBZ kpoint!')
         return ibzkpt, iop, timerev, diff_c.round()
-
 
     def where_is_q(self, q_c, bzq_qc):
         """Find the index of q points in BZ."""

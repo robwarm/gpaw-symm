@@ -26,7 +26,7 @@ Use the :program:`gpaw-test` command to run the tests::
       --from=TESTFILE       Run remaining tests, starting from TESTFILE
       --after=TESTFILE      Run remaining tests, starting after TESTFILE
       --range=test_i.py,test_j.py
-	                    Run tests in range test_i.py to test_j.py (inclusive)
+                            Run tests in range test_i.py to test_j.py (inclusive)
       -j JOBS, --jobs=JOBS  Run JOBS threads.
       --reverse             Run tests in reverse order (less overhead with
                             multiple jobs)
@@ -36,9 +36,9 @@ A temporary directory will be made and the tests will run in that
 directory.  If all tests pass, the directory is removed.
 
 The test suite consists of a large number of small and quick tests
-found in the :trac:`gpaw/test` directory.  Here are the results from a
-recent :ref:`test run <testsuite>`.  The tests run nightly in serial
-and in parallel.
+found in the :trac:`gpaw/test` directory.  The tests run nightly in serial
+and in parallel.  Here are the results from `BuildBot
+<https://gpaw-buildbot.fysik.dtu.dk/waterfall>`_.
 
 
 

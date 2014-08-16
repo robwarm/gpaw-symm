@@ -8,23 +8,11 @@ In this exercise we calculate optical spectrum of Na2 molecule using
 linear response time-dependent density functional theory. We start
 with a normal ground state calculation:
 
-Linear response TDDFT needs unoccupied states, so we calculate 19 of
-them in addition to the one occupied state. Note that in realistic
-calculation there should be more vacuum around the molecule. One might
-also want to first optimize the geometry.  Get inspiration from the
-exercise :ref:`structure_optimization`, modify it to Na2 instead of
-H2, and save the structure at the end::
+.. literalinclude:: Na2TDDFT.py
 
-  calc.write('na2_gs.gpw')
+.. highlight:: bash
 
-Then start a new calculation with more vacuum and unoccupied states::
-
-  atoms, calc = restart('na2_gs.gpw')
-  atoms.center(vacuum=6.0)
-  calc.set(nbands=20, ...)
-  ...
-
-Once the ground state calculation with unoccupied states is finished, a linear response TDDFT calculation is performed::
+Once the ground state calculation with unoccupied states is finished, the last part of the script performs a linear response TDDFT calculation::
 
   lr = LrTDDFT(calc, xc='LDA')
   lr.write('Omega_Na2.gz')

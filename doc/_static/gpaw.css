@@ -1,5 +1,8 @@
 @import "default.css";
 
+dl.function {background-color: #FFF3F3}
+dl.class {background-color: #FFF3F3}
+
 img {border: none;}
 
 /* This will center equations.  Alternatively, one could use a fixed

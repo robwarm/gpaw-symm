@@ -1,0 +1,62 @@
+----------------------------------------------------------
+Non-self-consistent RPA correlation energy
+----------------------------------------------------------
+Started at:   Fri Jun 27 15:24:30 2014
+
+Atoms                          : Si
+Ground state XC functional     : PBE
+Valence electrons              : 4
+Number of bands                : 10000
+Number of spins                : 2
+Number of k-points             : 1
+Number of irreducible k-points : 1
+Number of q-points             : 1
+Number of irreducible q-points : 1
+
+    q: [0.0000 0.0000 0.0000] - weight: 1.000
+
+----------------------------------------------------------
+----------------------------------------------------------
+
+Analytical coupling constant integration
+
+Frequencies
+    Gauss-Legendre integration with 16 frequency points
+    Transformed from [0,oo] to [0,1] using e^[-aw^(1/B)]
+    Highest frequency point at 800.0 eV and B=2.0
+
+Parallelization
+    Total number of CPUs          : 4
+    Frequency decomposition       : 1
+    K-point/band decomposition    : 4
+
+Response function bands : Equal to number of plane waves
+Plane wave cutoffs (eV) :  131  163  204  256  320  400
+
+# 0  -  15:26:17
+q = [0.000 0.000 0.000]
+E_cut = 131 eV / Bands = 1743:   E_c(q) = -4.321/-4.291/-4.291 eV
+E_cut = 163 eV / Bands = 2469:   E_c(q) = -4.395/-4.364/-4.364 eV
+E_cut = 204 eV / Bands = 3407:   E_c(q) = -4.443/-4.412/-4.412 eV
+E_cut = 256 eV / Bands = 4729:   E_c(q) = -4.478/-4.448/-4.448 eV
+E_cut = 320 eV / Bands = 6667:   E_c(q) = -4.506/-4.476/-4.476 eV
+E_cut = 400 eV / Bands = 9315:   E_c(q) = -4.527/-4.497/-4.497 eV
+
+==========================================================
+
+Total correlation energy:
+   131:   -4.3010 eV
+   164:   -4.3745 eV
+   205:   -4.4225 eV
+   256:   -4.4581 eV
+   320:   -4.4861 eV
+   400:   -4.5073 eV
+
+Extrapolated energies:
+   131 - 164:  -4.559 eV
+   164 - 205:  -4.543 eV
+   205 - 256:  -4.548 eV
+   256 - 320:  -4.556 eV
+   320 - 400:  -4.561 eV
+
+Calculation completed at:  Sat Jun 28 01:06:06 2014

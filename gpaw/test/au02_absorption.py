@@ -1,56 +1,63 @@
-from ase.io import read
 import numpy as np
-from gpaw import GPAW, FermiDirac, Mixer
-from ase import Atom, Atoms
-from ase.visualize import view
-from gpaw.mixer import Mixer
-from gpaw.response.df import DF
+from ase import Atoms
+from gpaw import GPAW, FermiDirac
+from gpaw.response.df import DielectricFunction
+from gpaw.test import equal, findpeak
 
 GS = 1
 ABS = 1
 if GS:
-    cluster = Atoms([Atom('Au', (0, 0, 0)),
-                     Atom('Au', (0, 0, 2.564))
-                     ], pbc=True)
-    cluster.set_cell((12.,12.,12.),
-                   scale_atoms=False)
+    cluster = Atoms('Au2', [(0, 0, 0), (0, 0, 2.564)])
+    cluster.set_cell((6, 6, 6), scale_atoms=False)
     cluster.center()
-    #view(cluster)    
-    calc=GPAW(xc='RPBE',
-              mixer=Mixer(0.1,3),
-              nbands=30,
-              h=0.15,
-              mode='lcao',
-              basis='dzp',
-              occupations=FermiDirac(0.01),
-              stencils=(3,3))
+    calc = GPAW(mode='pw',
+                dtype=complex,
+                xc='RPBE',
+                nbands=16,
+                eigensolver='rmm-diis',
+                occupations=FermiDirac(0.01))
     
     cluster.set_calculator(calc)
     cluster.get_potential_energy()
-    calc.write('Au02.gpw','all')
-
+    calc.diagonalize_full_hamiltonian(nbands=24, scalapack=True)
+    calc.write('Au2.gpw', 'all')
 
 if ABS:
-    df = DF(calc='Au02.gpw',
-            q=np.array([0.0, 0.0, 0.00001]), 
-            w=np.linspace(0,14,141),
-            eta=0.1,
-            ecut=10,
-            optical_limit=True,
-            kcommsize=4)              
+    df = DielectricFunction('Au2.gpw',
+                            frequencies=np.linspace(0, 14, 141),
+                            hilbert=not True,
+                            eta=0.1,
+                            ecut=10)
 
-    df.get_absorption_spectrum()             
+    b0, b = df.get_dielectric_function(filename=None,
+                                       direction='z')
+    a0, a = df.get_polarizability(filename=None,
+                                  direction='z')
+    a0_ws, a_ws = df.get_polarizability(filename=None,
+                                        wigner_seitz_truncation=True,
+                                        direction='z')
 
-    d = np.loadtxt('Absorption.dat.z')
-    wpeak = 2.5 # eV
-    Nw = 25
-    if d[Nw, 4] > d[Nw-1, 4] and d[Nw, 4] > d[Nw+1, 4]:
-        pass
-    else:
-        raise ValueError('Plasmon peak not correct ! ')
+    w0_ = 5.60491055
+    I0_ = 244.693028
+    w_ = 5.696528390
+    I_ = 207.8
     
-    if np.abs(d[Nw, 4] - 0.25788817927) > 5e-5:
-        print d[Nw, 0], d[Nw, 4]
-        raise ValueError('Please check spectrum strength ! ')
-    
-
+    w, I = findpeak(np.linspace(0, 14., 141), b0.imag)
+    equal(w, w0_, 0.05)
+    equal(6**3 * I / (4 * np.pi), I0_, 0.5)
+    w, I = findpeak(np.linspace(0, 14., 141), a0.imag)
+    equal(w, w0_, 0.05)
+    equal(I, I0_, 0.5)
+    w, I = findpeak(np.linspace(0, 14., 141), a0_ws.imag)
+    equal(w, w0_, 0.05)
+    equal(I, I0_, 0.5)
+    w, I = findpeak(np.linspace(0, 14., 141), b.imag)
+    equal(w, w_, 0.05)
+    equal(6**3 * I / (4 * np.pi), I_, 0.5)
+    w, I = findpeak(np.linspace(0, 14., 141), a.imag)
+    equal(w, w_, 0.05)
+    equal(I, I_, 0.5)
+    # The Wigner-Seitz truncation does not give exactly the same for small cell
+    w, I = findpeak(np.linspace(0, 14., 141), a_ws.imag)
+    equal(w, w_, 0.2)
+    equal(I, I_, 8.0)

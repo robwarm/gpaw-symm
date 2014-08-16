@@ -1,3 +1,5 @@
+.. _wannier:
+    
 =================
 Wannier Functions
 =================

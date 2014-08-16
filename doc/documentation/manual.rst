@@ -28,8 +28,8 @@ Doing a PAW calculation
 -----------------------
 
 To do a PAW calculation with the GPAW code, you need an ASE
-:ase:`Atoms <ase/atoms.html>` object and a GPAW
-:class:`~gpaw.aseinterface.Calculator`::
+:class:`~ase.atoms.Atoms` object and a :class:`~gpaw.aseinterface.GPAW`
+calculator::
 
    _____________          ____________
   |             |        |            |
@@ -137,7 +137,7 @@ keyword            type       default value        description
 .. note:: 
    
    Parameters can be changed after the calculator has been constructed
-   by using the :meth:`~gpaw.paw.set` method:
+   by using the :meth:`~gpaw.aseinterface.GPAW.set` method:
 
    >>> calc.set(txt='H2.txt', charge=1)
 
@@ -158,7 +158,7 @@ keyword            type       default value        description
 
 .. _manual_mode:
 
-Finite Difference, Plane-wave or LCAO mode
+Finite-difference, plane-wave or LCAO mode
 ------------------------------------------
 
 Finite-difference:
@@ -196,7 +196,7 @@ Speed:
     will parallelize better.
     
 Absolute convergence:
-    With LCAO, it can be hard to reach complete basis set limit and get
+    With LCAO, it can be hard to reach the complete basis set limit and get
     absolute convergence of energies, whereas with FD and PW mode it is
     quite easy to do by decreasing the grid spacing or increasing the
     plane-wave cutoff energy, respectively.
@@ -308,7 +308,8 @@ For more flexibility, you can use this syntax::
     kpts={'size': (4, 4, 4)}  # 4x4x4 Monkhorst-pack
     kpts={'size': (4, 4, 4), 'gamma': True}  # shifted 4x4x4 Monkhorst-pack
 
-You can also specify the **k**-point density in units of points per Å\ `^-1`::
+You can also specify the **k**-point density in units of points per
+Å\ `^{-1}`::
     
     kpts={'density': 2.5}  # Monkhorst-Pack with a density of 2.5 points/Ang^-1
     kpts={'density': 2.5, 'even': True}  # round off to neares even number
@@ -891,7 +892,8 @@ example saves a differently named restart file every 5 iterations::
 
   calc.attach(OccasionalWriter().write, occasionally)
 
-See also :meth:`~gpaw.GPAW.attach`.
+See also :meth:`~gpaw.aseinterface.GPAW.attach`.
+
 
 ----------------------
 Command line arguments

@@ -13,7 +13,7 @@ from gpaw.utilities.memory import maxrss
 from gpaw.response.base import BASECHI
 from gpaw.response.parallel import parallel_partition, gatherv
 from gpaw.response.kernel import calculate_Kc, calculate_Kc_q
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 
 class BSE(BASECHI):
     """This class defines Bethe-Salpeter equations."""

@@ -4,7 +4,7 @@ from ase.dft.kpoints import monkhorst_pack
 from gpaw import *
 from gpaw.mpi import serial_comm
 from gpaw.test import equal
-from gpaw.xc.rpa_correlation_energy import RPACorrelation
+from gpaw.xc.rpa import RPACorrelation
 import numpy as np
 
 a0 = 5.43
@@ -24,15 +24,11 @@ E = Si.get_potential_energy()
 calc.diagonalize_full_hamiltonian(nbands=50)
 
 ecut = 50
-rpa = RPACorrelation(calc, qsym=False)
-E_rpa_noqsym = rpa.get_rpa_correlation_energy(ecut=ecut,
-                                              directions=[[0, 1.0]],
-                                              gauss_legendre=8)
+rpa = RPACorrelation(calc, qsym=False, nfrequencies=8)
+E_rpa_noqsym = rpa.calculate(ecut=[ecut])
 
-rpa = RPACorrelation(calc, qsym=True)
-E_rpa_qsym = rpa.get_rpa_correlation_energy(ecut=ecut,
-                                            directions=[[0, 1.0]],
-                                            gauss_legendre=8)
+rpa = RPACorrelation(calc, qsym=True, nfrequencies=8)
+E_rpa_qsym = rpa.calculate(ecut=[ecut])
 
 equal(E_rpa_qsym, E_rpa_noqsym, 0.001)
 equal(E_rpa_qsym, -12.61, 0.01)

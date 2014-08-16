@@ -12,7 +12,7 @@ are saved to a *.gpw* file. As we are dealing with small bulk system,
 plane wave mode is the most appropriate here.
 
 .. literalinclude:: bandstructure.py
-    :lines: 8-23
+    :lines: 7-22
 
 Next, :mod:`ase.dft.kpoints` module is used for generating k-points along
 the high symmetry directions in the Brillouin zone. The below figure shows 
@@ -28,15 +28,15 @@ unoccupied states can be sometimes converged faster with the conjugate gradient
 eigensolver.
 
 .. literalinclude:: bandstructure.py
-    :lines: 25-44
+    :lines: 24-41
 
 Finally, the bandstructure can be plotted e.g. with matplotlib. 
 The :func:`ase.dft.kpoints.get_bandpath` provides in addition to the 
 actual k-points information which is useful for plotting.
 
 .. literalinclude:: bandstructure.py
-    :lines: 46-69
+    :lines: 43-61
 
 .. figure:: bandstructure.png
 
-The full script: :svn:`~doc/tutorials/bandstructures/bandstructure.py`.
+The full script: :download:`bandstructure.py`.

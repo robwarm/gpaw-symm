@@ -14,7 +14,7 @@ should have a look at the page :ref:`introduction_to_paw`, read this
 
 If you want some general information on the numerical techniques
 utilized by the GPAW code, you should read the page
-:ref:`features_and_algorithms`.
+:ref:`algorithms`.
 
 Developers should consult the :ref:`devel` pages.
 

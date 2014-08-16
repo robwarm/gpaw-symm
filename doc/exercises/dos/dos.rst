@@ -12,17 +12,12 @@ relative to the Fermilevel).
   number of bands).
 
 * The DOS for the anti-ferromagnetic phase looks a bit like that for
-  the non-magnetic phase - is it magnetic at all?!  Try to visualize
-  the magnetization like this::
+  the non-magnetic phase - is it magnetic at all?!  Calculate
+  the magnetization like this:
 
-    from ase.io import write
-    from gpaw import GPAW
-    calc = GPAW('anti.gpw')
-    atoms = calc.get_atoms()
-    up = calc.get_pseudo_density(0)
-    down = calc.get_pseudo_density(1)
-    zeta = (up - down) / (up + down)
-    write('magnetization.cube', atoms, data=zeta)
+  .. literalinclude:: magnetization.py
+    
+  and :ref:`look at it <iso>`.
 
 * Calculate the DOS for bulk Aluminum and compare it
   (qualitatively) to the DOS for the non-magnetic calculation. The DOS

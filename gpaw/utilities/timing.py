@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # Copyright (C) 2003  CAMP
 # Please see the accompanying LICENSE file for further information.
 
@@ -17,14 +19,14 @@ this case a huge number is returned (1.0e100).  This problem can be
 avoided by calling the ``update()`` function at intervals smaller than
 72 minutes."""
 
+import sys
 import time
 import math
-import sys
+import functools
 
 import numpy as np
 
 import gpaw.mpi as mpi
-MASTER = 0
 
 wrap = 1e-6 * 2**32
 
@@ -45,6 +47,7 @@ def clock():
         return 1.0e100
     return cputime
 
+    
 def update():
     global trouble, t0, c0, cputime
     if trouble:
@@ -61,12 +64,13 @@ def update():
     t0 = t
     c0 = c
 
+    
 def function_timer(func, *args, **kwargs):
     out = kwargs.pop('timeout', sys.stdout)
     t1 = time.time()
     r = func(*args, **kwargs)
     t2 = time.time()
-    print >>out, t2 - t1
+    print(t2 - t1, file=out)
     return r
 
     
@@ -87,7 +91,8 @@ class Timer:
         self.running.append(name)
         
     def stop(self, name=None):
-        if name is None: name = self.running[-1]
+        if name is None:
+            name = self.running[-1]
         names = tuple(self.running)
         running = self.running.pop()
         if name != running:
@@ -95,6 +100,28 @@ class Timer:
                                'Requested stopping of %s but topmost is %s'
                                % (name, running))
         self.timers[names] += time.time()
+    
+    def __call__(self, name):
+        """Context manager for timing a block of code.
+        
+        Example (t is a timer object)::
+
+            with t('Add two numbers'):
+                x = 2 + 2
+                
+            # same as this:
+            t.start(Add two numbers')
+            x = 2 + 2
+            t.stop()
+        """
+        self.start(name)
+        return self
+        
+    def __enter__(self):
+        pass
+        
+    def __exit__(self, *args):
+        self.stop()
             
     def get_time(self, *names):
 #        print self.timers, names
@@ -156,15 +183,44 @@ class Timer:
         for name, t in timer.timers.items():
             self.timers[name] = self.timers.get(name, 0.0) + t
 
+            
+class timer:
+    """Decorator for timing a method call.
+    
+    Example::
+        
+        class A:
+            def __init__(self):
+                self.timer = Timer()
+                
+            @timer('Add two numbers')    
+            def add(self, x, y):
+                return x + y
+                
+        """
+    def __init__(self, name):
+        self.name = name
+    
+    def __call__(self, method):
+        @functools.wraps(method)
+        def new_method(slf, *args, **kwargs):
+            slf.timer.start(self.name)
+            x = method(slf, *args, **kwargs)
+            try:
+                slf.timer.stop()
+            except IndexError:
+                pass
+            return x
+        return new_method
 
+        
 class NullTimer:
     """Compatible with Timer and StepTimer interfaces.  Does nothing."""
     def __init__(self): pass
     def print_info(self, calc): pass
     def start(self, name): pass
     def stop(self, name=None): pass
-    def get_time(self, name):
-        return 0.0
+    def get_time(self, name): return 0.0
     def write(self, out=sys.stdout): pass
     def write_now(self, mark=''): pass
     def add(self, timer): pass
@@ -258,11 +314,10 @@ class StepTimer(Timer):
         self.now = 'temporary now'
         self.start(self.now)
 
-
     def write_now(self, mark=''):
         self.stop(self.now)
-        if self.alwaysprint or mpi.rank == MASTER:
-            print >> self.out, self.name, mark, self.get_time(self.now)
+        if self.alwaysprint or mpi.rank == 0:
+            print(self.name, mark, self.get_time(self.now), file=self.out)
         self.out.flush()
         del self.timers[self.now]
         self.start(self.now)
@@ -275,8 +330,8 @@ class TAUTimer(Timer):
     The TAU Python API will not output any data if there are any
     unmatched starts/stops in the code."""
 
-    top_level = 'GPAW.calculator' # TAU needs top level timer 
-    merge = True # Requires TAU 2.19.2 or later
+    top_level = 'GPAW.calculator'  # TAU needs top level timer
+    merge = True  # Requires TAU 2.19.2 or later
 
     def __init__(self):
         Timer.__init__(self)
@@ -314,8 +369,8 @@ class HPMTimer(Timer):
     HPM will hang. Hence, we only call HPM_start/stop on a list
     subset of timers."""
     
-    top_level = 'GPAW.calculator' # HPM needs top level timer
-    compatible = ['Initialization','SCF-cycle'] 
+    top_level = 'GPAW.calculator'  # HPM needs top level timer
+    compatible = ['Initialization', 'SCF-cycle'] 
 
     def __init__(self):
         Timer.__init__(self)
@@ -338,6 +393,7 @@ class HPMTimer(Timer):
         Timer.write(self, out)
         self.hpm_stop(self.top_level)
 
+        
 class CrayPAT_timer(Timer):
     """Interface to CrayPAT API. In addition to regular timers,
     the corresponding regions are profiled by CrayPAT. The gpaw-python has
@@ -350,11 +406,11 @@ class CrayPAT_timer(Timer):
         self.craypat_region_begin = craypat_region_begin
         self.craypat_region_end = craypat_region_end
         self.regions = {}
-        self.region_id = 5 # leave room for regions in C
+        self.region_id = 5  # leave room for regions in C
 
     def start(self, name):
         Timer.start(self, name)
-        if self.regions.has_key(name):
+        if name in self.regions:
             id = self.regions[name]
         else:
             id = self.region_id
@@ -366,4 +422,3 @@ class CrayPAT_timer(Timer):
         Timer.stop(self, name)
         id = self.regions[name]
         self.craypat_region_end(id)
-

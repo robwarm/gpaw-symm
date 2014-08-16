@@ -8,14 +8,13 @@ Contents
    :maxdepth: 2
 
    index
-   overview  <features_and_algorithms>
+   algorithms
    download
    install/install
    setups/setups
    tutorials/tutorials
    exercises/exercises
    documentation/documentation
-   performance
    devel/benchmarks
    devel/releasenotes
    faq
@@ -29,6 +28,7 @@ Old pages
 .. toctree::
    :maxdepth: 2
 
+   exercises/summerschool14
    exercises/summerschool12
    exercises/summerschool10
    exercises/summerschool08

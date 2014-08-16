@@ -31,46 +31,46 @@ void dscal_(int*n, double* alpha, double* x, int* incx);
 void zscal_(int*n, void* alpha, void* x, int* incx);
 
 void daxpy_(int* n, double* alpha,
-	    double* x, int *incx,
-	    double* y, int *incy);
+            double* x, int *incx,
+            double* y, int *incy);
 void zaxpy_(int* n, void* alpha,
-	    void* x, int *incx,
-	    void* y, int *incy);
+            void* x, int *incx,
+            void* y, int *incy);
 
 void dsyrk_(char *uplo, char *trans, int *n, int *k,
-	    double *alpha, double *a, int *lda, double *beta,
-	    double *c, int *ldc);
+            double *alpha, double *a, int *lda, double *beta,
+            double *c, int *ldc);
 void zher_(char *uplo, int *n,
-	   double *alpha, void *x, int *incx, 
+           double *alpha, void *x, int *incx, 
            void *a, int *lda);
 void zherk_(char *uplo, char *trans, int *n, int *k,
-	    double *alpha, void *a, int *lda,
-	    double *beta,
-	    void *c, int *ldc);
+            double *alpha, void *a, int *lda,
+            double *beta,
+            void *c, int *ldc);
 void dsyr2k_(char *uplo, char *trans, int *n, int *k,
-	     double *alpha, double *a, int *lda,
-	     double *b, int *ldb, double *beta,
-	     double *c, int *ldc);
+             double *alpha, double *a, int *lda,
+             double *b, int *ldb, double *beta,
+             double *c, int *ldc);
 void zher2k_(char *uplo, char *trans, int *n, int *k,
-	     void *alpha, void *a, int *lda,
-	     void *b, int *ldb, double *beta,
-	     void *c, int *ldc);
+             void *alpha, void *a, int *lda,
+             void *b, int *ldb, double *beta,
+             void *c, int *ldc);
 void dgemm_(char *transa, char *transb, int *m, int * n,
-	    int *k, double *alpha, double *a, int *lda,
-	    double *b, int *ldb, double *beta,
-	    double *c, int *ldc);
+            int *k, double *alpha, double *a, int *lda,
+            double *b, int *ldb, double *beta,
+            double *c, int *ldc);
 void zgemm_(char *transa, char *transb, int *m, int * n,
-	    int *k, void *alpha, void *a, int *lda,
-	    void *b, int *ldb, void *beta,
-	    void *c, int *ldc);
+            int *k, void *alpha, void *a, int *lda,
+            void *b, int *ldb, void *beta,
+            void *c, int *ldc);
 void dgemv_(char *trans, int *m, int * n,
-	    double *alpha, double *a, int *lda,
-	    double *x, int *incx, double *beta,
-	    double *y, int *incy);
+            double *alpha, double *a, int *lda,
+            double *x, int *incx, double *beta,
+            double *y, int *incy);
 void zgemv_(char *trans, int *m, int * n,
-	    void *alpha, void *a, int *lda,
-	    void *x, int *incx, void *beta,
-	    void *y, int *incy);
+            void *alpha, void *a, int *lda,
+            void *x, int *incx, void *beta,
+            void *y, int *incy);
 double ddot_(int *n, void *dx, int *incx, void *dy, int *incy);
 
 PyObject* scal(PyObject *self, PyObject *args)
@@ -107,7 +107,7 @@ PyObject* gemm(PyObject *self, PyObject *args)
     {
       m = PyArray_DIMS(a)[1];
       for (int i = 2; i < PyArray_NDIM(a); i++)
-	m *= PyArray_DIMS(a)[i];
+        m *= PyArray_DIMS(a)[i];
       k = PyArray_DIMS(a)[0];
       lda = MAX(1, PyArray_STRIDES(a)[0] / PyArray_STRIDES(a)[PyArray_NDIM(a) - 1]);
       ldb = MAX(1, PyArray_STRIDES(b)[0] / PyArray_STRIDES(b)[1]);
@@ -117,7 +117,7 @@ PyObject* gemm(PyObject *self, PyObject *args)
     {
       k = PyArray_DIMS(a)[1];
       for (int i = 2; i < PyArray_NDIM(a); i++)
-	k *= PyArray_DIMS(a)[i];
+        k *= PyArray_DIMS(a)[i];
       m = PyArray_DIMS(a)[0];
       lda = MAX(1, k);
       ldb = MAX(1, PyArray_STRIDES(b)[0] / PyArray_STRIDES(b)[PyArray_NDIM(b) - 1]);
@@ -160,7 +160,7 @@ PyObject* gemv(PyObject *self, PyObject *args)
     {
       m = PyArray_DIMS(a)[1];
       for (int i = 2; i < PyArray_NDIM(a); i++)
-	m *= PyArray_DIMS(a)[i];
+        m *= PyArray_DIMS(a)[i];
       n = PyArray_DIMS(a)[0];
       lda = MAX(1, m);
     }
@@ -168,7 +168,7 @@ PyObject* gemv(PyObject *self, PyObject *args)
     {
       n = PyArray_DIMS(a)[0];
       for (int i = 1; i < PyArray_NDIM(a)-1; i++)
-	n *= PyArray_DIMS(a)[i];
+        n *= PyArray_DIMS(a)[i];
       m = PyArray_DIMS(a)[PyArray_NDIM(a)-1];
       lda = MAX(1, m);
     }
@@ -244,26 +244,39 @@ PyObject* czher(PyObject *self, PyObject *args)
 
 PyObject* rk(PyObject *self, PyObject *args)
 {
-  double alpha;
-  PyArrayObject* a;
-  double beta;
-  PyArrayObject* c;
-  if (!PyArg_ParseTuple(args, "dOdO", &alpha, &a, &beta, &c))
-    return NULL;
-  int n = PyArray_DIMS(a)[0];
-  int k = PyArray_DIMS(a)[1];
-  for (int d = 2; d < PyArray_NDIM(a); d++)
-    k *= PyArray_DIMS(a)[d];
-  int ldc = PyArray_STRIDES(c)[0] / PyArray_STRIDES(c)[1];
-  if (PyArray_DESCR(a)->type_num == NPY_DOUBLE)
-    dsyrk_("u", "t", &n, &k,
-           &alpha, DOUBLEP(a), &k, &beta,
-           DOUBLEP(c), &ldc);
-  else
-    zherk_("u", "c", &n, &k,
-           &alpha, (void*)COMPLEXP(a), &k, &beta,
-           (void*)COMPLEXP(c), &ldc);
-  Py_RETURN_NONE;
+    double alpha;
+    PyArrayObject* a;
+    double beta;
+    PyArrayObject* c;
+    char trans = 'c';
+    if (!PyArg_ParseTuple(args, "dOdO|c", &alpha, &a, &beta, &c, &trans))
+        return NULL;
+
+    int n = PyArray_DIMS(c)[0];
+    
+    int k, lda;
+    
+    if (trans == 'c') {
+        k = PyArray_DIMS(a)[1];
+        for (int d = 2; d < PyArray_NDIM(a); d++)
+            k *= PyArray_DIMS(a)[d];
+        lda = k;
+    }
+    else {
+        k = PyArray_DIMS(a)[0];
+        lda = n;
+    }
+    
+    int ldc = PyArray_STRIDES(c)[0] / PyArray_STRIDES(c)[1];
+    if (PyArray_DESCR(a)->type_num == NPY_DOUBLE)
+        dsyrk_("u", &trans, &n, &k,
+               &alpha, DOUBLEP(a), &lda, &beta,
+               DOUBLEP(c), &ldc);
+    else
+        zherk_("u", &trans, &n, &k,
+               &alpha, (void*)COMPLEXP(a), &lda, &beta,
+               (void*)COMPLEXP(c), &ldc);
+    Py_RETURN_NONE;
 }
 
 PyObject* r2k(PyObject *self, PyObject *args)
@@ -308,7 +321,7 @@ PyObject* dotc(PyObject *self, PyObject *args)
     {
       double result;
       result = ddot_(&n, (void*)DOUBLEP(a),
-	     &incx, (void*)DOUBLEP(b), &incy);
+             &incx, (void*)DOUBLEP(b), &incy);
       return PyFloat_FromDouble(result);
     }
   else
@@ -317,7 +330,7 @@ PyObject* dotc(PyObject *self, PyObject *args)
       double_complex* bp = COMPLEXP(b);
       double_complex z = 0.0;
       for (int i = 0; i < n; i++)
-	z += conj(ap[i]) * bp[i];
+        z += conj(ap[i]) * bp[i];
       return PyComplex_FromDoubles(creal(z), cimag(z));
     }
 }
@@ -338,7 +351,7 @@ PyObject* dotu(PyObject *self, PyObject *args)
     {
       double result;
       result = ddot_(&n, (void*)DOUBLEP(a),
-	     &incx, (void*)DOUBLEP(b), &incy);
+             &incx, (void*)DOUBLEP(b), &incy);
       return PyFloat_FromDouble(result);
     }
   else
@@ -347,7 +360,7 @@ PyObject* dotu(PyObject *self, PyObject *args)
       double_complex* bp = COMPLEXP(b);
       double_complex z = 0.0;
       for (int i = 0; i < n; i++)
-	z += ap[i] * bp[i];
+        z += ap[i] * bp[i];
       return PyComplex_FromDoubles(creal(z), cimag(z));
     }
 }
@@ -372,12 +385,12 @@ PyObject* multi_dotu(PyObject *self, PyObject *args)
       double *cp = DOUBLEP(c);
 
       for (int i = 0; i < n0; i++)
-	{
-	  cp[i] = ddot_(&n, (void*)ap, 
-	     &incx, (void*)bp, &incy);
-	  ap += n;
-	  bp += n;
-	}
+        {
+          cp[i] = ddot_(&n, (void*)ap, 
+             &incx, (void*)bp, &incy);
+          ap += n;
+          bp += n;
+        }
     }
   else
     {
@@ -385,13 +398,13 @@ PyObject* multi_dotu(PyObject *self, PyObject *args)
       double_complex* bp = COMPLEXP(b);
       double_complex* cp = COMPLEXP(c);
       for (int i = 0; i < n0; i++)
-	{
-	  cp[i] = 0.0;
-	  for (int j = 0; j < n; j++)
-	      cp[i] += ap[j] * bp[j];
-	  ap += n;
-	  bp += n;
-	}
+        {
+          cp[i] = 0.0;
+          for (int j = 0; j < n; j++)
+              cp[i] += ap[j] * bp[j];
+          ap += n;
+          bp += n;
+        }
     }
   Py_RETURN_NONE;
 }
@@ -413,18 +426,18 @@ PyObject* multi_axpy(PyObject *self, PyObject *args)
    if (PyArray_DESCR(alpha)->type_num == NPY_DOUBLE)
     {
       if (PyArray_DESCR(x)->type_num == NPY_CDOUBLE)
-	n *= 2;
+        n *= 2;
       double *ap = DOUBLEP(alpha);
       double *xp = DOUBLEP(x);
       double *yp = DOUBLEP(y);
       for (int i = 0; i < n0; i++)
-	{
-	  daxpy_(&n, &ap[i], 
-		 (void*)xp, &incx,
-		 (void*)yp, &incy);
-	  xp += n;
-	  yp += n;
-	}
+        {
+          daxpy_(&n, &ap[i], 
+                 (void*)xp, &incx,
+                 (void*)yp, &incy);
+          xp += n;
+          yp += n;
+        }
     }
   else
     {
@@ -432,13 +445,13 @@ PyObject* multi_axpy(PyObject *self, PyObject *args)
       double_complex *xp = COMPLEXP(x);
       double_complex *yp = COMPLEXP(y);
       for (int i = 0; i < n0; i++)
-	{
-	  zaxpy_(&n, (void*)(&ap[i]), 
-		 (void*)xp, &incx,
-		 (void*)yp, &incy);
-	  xp += n;
-	  yp += n;
-	}
+        {
+          zaxpy_(&n, (void*)(&ap[i]), 
+                 (void*)xp, &incx,
+                 (void*)yp, &incy);
+          xp += n;
+          yp += n;
+        }
     }
   Py_RETURN_NONE;
 }

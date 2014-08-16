@@ -4,7 +4,7 @@ import numpy as np
 from ase.parallel import paropen
 from ase.units import Ha
 from gpaw import GPAW
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 from gpaw.utilities import devnull
 from gpaw.kpt_descriptor import KPointDescriptor
 from gpaw.mpi import rank, size, world

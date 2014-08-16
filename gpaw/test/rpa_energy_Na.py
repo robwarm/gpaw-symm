@@ -6,7 +6,7 @@ from ase.lattice import bulk
 from gpaw import GPAW, FermiDirac
 from gpaw.wavefunctions.pw import PW
 from gpaw.mpi import size, serial_comm
-from gpaw.xc.rpa_correlation_energy import RPACorrelation
+from gpaw.xc.rpa import RPACorrelation
 from gpaw.test import equal
 
 kpts = monkhorst_pack((4,4,4))
@@ -31,10 +31,6 @@ calc.write('gs_pw.gpw', 'all')
 ecut = 120 
 calc = GPAW('gs_pw.gpw', communicator=serial_comm, txt=None)
 rpa = RPACorrelation(calc, txt='rpa_%s.txt' %(ecut))
-E = rpa.get_rpa_correlation_energy(ecut=ecut,
-                                   skip_gamma=False,
-                                   directions=[[0,1.0]],
-                                   kcommsize=size,
-                                   dfcommsize=size)
+E = rpa.calculate(ecut=[ecut])
 
 equal(E, -1.106, 0.005)

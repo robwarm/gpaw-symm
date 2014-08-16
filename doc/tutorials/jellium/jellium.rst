@@ -1,3 +1,5 @@
+.. _jellium:
+    
 =======
 Jellium
 =======
@@ -60,7 +62,7 @@ Other jellium geometries
 
 For other geometries, one will have to subclass
 :class:`~gpaw.jellium.JelliumPoissonSolver`, and implement the
-:meth:`~gpaw.jellium.JelliumPoissonSolver.set_mask` method:
+:meth:`~gpaw.jellium.JelliumPoissonSolver.get_mask` method:
 
 .. autoclass:: gpaw.jellium.JelliumPoissonSolver
    :members:

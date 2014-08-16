@@ -16,7 +16,7 @@ from gpaw.xc.tools import vxc
 from gpaw.wavefunctions.pw import PWWaveFunctions
 from gpaw.response.parallel import set_communicator, parallel_partition, SliceAlongFrequency, GatherOrbitals
 from gpaw.response.base import BASECHI
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 from gpaw.response.kernel import calculate_Kxc, calculate_Kc, calculate_Kc_q
 
 class GW(BASECHI):

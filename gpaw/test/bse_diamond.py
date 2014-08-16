@@ -42,7 +42,7 @@ if bse:
     bse.get_dielectric_function('C_bse.dat')
 
 if df:
-    from gpaw.response.df import DF
+    from gpaw.response.df0 import DF
     df = DF('C_kpt8.gpw',
             w=np.linspace(0,20,201),
             q=np.array([0.0001,0,0.]),

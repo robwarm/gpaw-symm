@@ -4,16 +4,10 @@ def agts(queue):
  
 
 if __name__ == '__main__':
-    import pickle
-    results = pickle.load(open('results.pckl'))
-    print results
-    pbe, pbe0, pbea, pbe0a, pbeb, pbe0b = results.T
-    maea = abs(pbe - pbea).mean()
-    maeb = abs(pbe - pbeb).mean()
-    mae0a = abs(pbe0 - pbe0a).mean()
-    mae0b = abs(pbe0 - pbe0b).mean()
-    print maea, maeb, mae0a, mae0b
-    assert abs(maea - 0.053) < 0.002
-    assert abs(maeb - 0.034) < 0.002
-    assert abs(mae0a - 0.092) < 0.002
-    assert abs(mae0b - 0.073) < 0.002
+    import ase.db
+    c = ase.db.connect('gaps.db')
+    for d in sorted(c.select(), key=lambda d: d.name):
+        print(d.name)
+        for k, e in d.data.items():
+            r = e[:2].tolist() + (e[:2]-e[2:4]).tolist() + (e[:2]-e[4:]).tolist()
+            print(k, ' '.join(['%6.3f' % x for x in r]))

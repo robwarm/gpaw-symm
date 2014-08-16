@@ -10,13 +10,13 @@
           {%- block sidebarsearch %}
           {%- if pagename != "search" %}
             <!-- <h3>[[ builder == 'web' and 'Keyword' or 'Quick' ]] search</h3> -->
-	    <div class="toprightsearch">
+            <div class="toprightsearch">
             <form class="search" action="{{ pathto('search') }}" method="get">
               <input type="text" name="q" size="18" /> <input type="submit" value="Search" />
               <input type="hidden" name="check_keywords" value="yes" />
               <input type="hidden" name="area" value="default" />
             </form>
-	    </div>
+            </div>
 
             {%- if builder == 'web' %}
             <p style="font-size: 90%">Enter a module, class or function name.</p>
@@ -37,7 +37,7 @@
         <li><a href="{{ pathto('index') }}"><img class="logo" src="{{ pathto('_static/' + logo, 1) }}" alt="GPAW logo"/></a></li>
         {%- endblock %}
 
-	<!-- <li> {{ reldelim1 }} <a href="{{ pathto('download') }}">Download</a>{{ reldelim1 }}</li> -->
+        <!-- <li> {{ reldelim1 }} <a href="{{ pathto('download') }}">Download</a>{{ reldelim1 }}</li> -->
         <!-- <li> {{ reldelim1 }} <a href="{{ pathto('setups/setups') }}">Setups</a>{{ reldelim1 }}</li> -->
         <!-- <li> {{ reldelim1 }} <a href="{{ pathto('tutorials/tutorials') }}">Tutorials</a>{{ reldelim1 }}</li> -->
         <!-- <li> {{ reldelim1 }} <a href="{{ pathto('documentation/documentation') }}">Documentation</a>{{ reldelim1 }}</li> -->
@@ -50,7 +50,7 @@
           <li><a href="{{ parent.link|e }}" accesskey="U">{{ parent.title }}</a>{{ reldelim1 }}</li>
         {%- endfor %}
         {%- block relbaritems %}
-	{% endblock %}
+        {% endblock %}
 
       </ul>
     </div>
@@ -61,23 +61,22 @@
         <div class="sphinxsidebarwrapper">
           {%- block sidebartoc %}
 
-	  <h3>GPAW</h3>
-	  <ul class="this-page-menu">
-	    <li><a href="{{ pathto('documentation/documentation') }}">Documentation</a></li>
-	    <li><a href="{{ pathto('download') }}">Download</a></li>
-	    <li><a href="{{ pathto('setups/setups') }}">Setups</a></li>
+          <h3>GPAW</h3>
+          <ul class="this-page-menu">
+            <li><a href="{{ pathto('documentation/documentation') }}">Documentation</a></li>
+            <li><a href="{{ pathto('documentation/manual') }}">Manual</a></li>
+            <li><a href="{{ pathto('download') }}">Download</a></li>
+            <li><a href="{{ pathto('setups/setups') }}">Setups</a></li>
             <li><a href="{{ pathto('tutorials/tutorials') }}">Tutorials</a></li>
-	    <li><a href="{{ pathto('exercises/exercises') }}">Exercises</a></li>
-	    <li><a href="{{ pathto('faq') }}">FAQ</a></li>
-	    <li><a href="{{ pathto('features_and_algorithms') }}">Features</a></li>
-            <li><a href="{{ pathto('performance') }}">Performance</a></li>
+            <li><a href="{{ pathto('exercises/exercises') }}">Exercises</a></li>
+            <li><a href="{{ pathto('faq') }}">FAQ</a></li>
             <li><a href="{{ pathto('devel/releasenotes') }}">Release Notes</a></li>
             <li><a href="{{ pathto('mailinglists') }}">Mailing lists</a></li>
             <li><a href="{{ pathto('documentation/literature') }}#citations-of-the-gpaw-method-papers">Publications</a></li>
             <li><a href="{{ pathto('genindex') }}">Index</a></li>
-	  </ul>
-	  <h3>Development</h3>
-	  <ul class="this-page-menu">
+          </ul>
+          <h3>Development</h3>
+          <ul class="this-page-menu">
             <li><a href="{{ pathto('devel/devel') }}">Development</a></li>
             <li><a href="{{ pathto('devel/projects/projects') }}">Projects</a></li>
             <li><a href="http://wiki.fysik.dtu.dk/gpaw/epydoc/gpaw-module.html">
@@ -88,18 +87,18 @@
           <ul>
             <li><a href="https://wiki.fysik.dtu.dk/ase/">ASE Web Page</a></li>
           </ul>
-	  <h3>Workshop 2013</h3>
-	  <ul class="this-page-menu">
-	    <li><a href="{{ pathto('devel/workshop') }}">Program</a></li>
-	  </ul>
-<!--	  <h3>Summer School 2012</h3>
-	  <ul class="this-page-menu">
-	    <li><a href="{{ pathto('exercises/summerschool12') }}">Instructions</a></li>
-	    <li><a href="{{ pathto('exercises/exercises') }}">Exercises</a></li>
-	    <li><a href="{{ pathto('exercises/faeq') }}">Exercises-FAQ</a></li>
-	    <li><a href="http://www.gbar.dtu.dk/">Computer Lab docs</a></li>
-	  </ul>
+<!--      <h3>Workshop 2013</h3>
+          <ul class="this-page-menu">
+            <li><a href="{{ pathto('devel/workshop') }}">Program</a></li>
+          </ul>
 -->
+          <h3>Summer School 2014</h3>
+          <ul class="this-page-menu">
+            <li><a href="{{ pathto('exercises/summerschool14') }}">Instructions</a></li>
+            <li><a href="{{ pathto('exercises/exercises') }}">Exercises</a></li>
+            <li><a href="{{ pathto('exercises/faeq') }}">Exercises-FAQ</a></li>
+            <li><a href="http://www.cc.dtu.dk/">DTU Computing Center</a></li>
+          </ul>
           {%- if display_toc and current_page_name not in ['index', 'contents'] %}
             <h3>This page</h3>
             {{ toc }}
@@ -109,12 +108,12 @@
 
           {%- block sidebarrel %}
           {%- if prev %}
-	  <!-- Where does one find this "prev" variable?
-	  
+          <!-- Where does one find this "prev" variable?
+          
             <h4>Previous topic</h4>
             <p class="topless"><a href="{{ prev.link|e }}"
             title="previous chapter">{{ prev.title }}</a></p>
-	    -->
+            -->
           {%- endif %}
           {%- if next %}
 
@@ -236,14 +235,6 @@ and replacing [] by corresponding curly brackets
 
 {%- block footer %}
     <div class="footer">
-    {%- if builder == 'html' %}
-      <div class="sidebarfooter">
-        <a href="http://validator.w3.org/check?uri=http://wiki.fysik.dtu.dk/gpaw/{{ pagename + file_suffix }}">
-          <img src="http://www.w3.org/Icons/valid-xhtml10"
-            alt="Valid XHTML 1.0 Transitional" height="31" width="88" />
-        </a>
-      </div>
-    {%- endif %}
     {%- if hasdoc('copyright') %}
       &copy; <a href="{{ pathto('copyright') }}">Copyright</a> {{ copyright }}.
     {%- else %}

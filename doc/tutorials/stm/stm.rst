@@ -1,4 +1,4 @@
-.. _stm-tutorial:
+.. _stm tutorial:
 
 ==============================
 Tutorial: STM images - Al(111)

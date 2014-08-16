@@ -1,6 +1,6 @@
 import sys
 
-from ase import Atoms, Atom
+from ase import Atoms
 
 from gpaw import GPAW
 from gpaw.test import equal
@@ -50,6 +50,4 @@ equal(E[True], E[False], 0.01)
 
 energy_tolerance = 0.0003
 equal(E[False], 6.97818, energy_tolerance)
-assert 15 <= niter[False] <= 24, niter[False]
 equal(E[True], 6.97153, energy_tolerance)
-assert 15 <= niter[True] <= 24, niter[True]

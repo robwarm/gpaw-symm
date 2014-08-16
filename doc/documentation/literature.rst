@@ -16,7 +16,7 @@ Links to guides and manual pages
 
 * The code :ref:`overview`
 
-* The :ref:`features_and_algorithms` used in the code
+* The :ref:`algorithms` used in the code
 
 
 .. _literature_reports_presentations_and_theses:

@@ -45,8 +45,9 @@ for k in [2, 3]:
                 chiold.calculate()
                 chi0old_wGG = chiold.chi0_wGG
 
-                chi = Chi0(calc, omega, ecut=100, txt=name + '.log')
-                pd, chi0_wGG, _ = chi.calculate(q_c)
+                chi = Chi0(calc, omega, hilbert=False,
+                           ecut=100, txt=name + '.log')
+                pd, chi0_wGG, _, _ = chi.calculate(q_c)
 
                 assert abs(chi0_wGG - chi0old_wGG).max() < 1e-15
                 
@@ -75,7 +76,7 @@ for k in [2, 3]:
                 chi0old_wGG[:, 0] /= q0
                 chi0old_wGG[:, :, 0] /= q0
                 
-                pd, chi0_wGG, _ = chi.calculate([0, 0, 0])
+                pd, chi0_wGG, _, _ = chi.calculate([0, 0, 0])
                 
                 assert abs(chi0_wGG - chi0old_wGG).max() < 0.003
                 assert abs(chi0_wGG - chi0old_wGG)[:, 1:, 1:].max() < 1e-9

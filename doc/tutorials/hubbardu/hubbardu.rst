@@ -1,5 +1,6 @@
 .. index:: DFT+U, LDA+U, Hubbard
-
+.. _hubbardu:
+    
 ============
 DFT+U theory
 ============
@@ -18,7 +19,7 @@ The DFT+U corrections can be introduced in ab initio calculations in
 different ways.  The two main branches are the one introduced by
 Liechtenstein et al. [Liechtenstein]_, in which U and J enter as
 independent corrections in the calculations, and the one proposed by
-Anasimov et al. [Anasimov]_, where only a single effective
+Anasimov et al. [Dudarev]_, where only a single effective
 `U_\text{eff} = U-J` parameter accounts for the Coulomb interaction,
 neglecting thereby any higher multi-polar terms.  The latter is the
 one implemented in GPAW. Thus, the DFT+U totally energy in GPAW is:
@@ -115,5 +116,5 @@ References
 
 .. [Liechtenstein] A. I. Liechtenstein, V. I. Anisimov and J. Zaane,
                    Phys. Rev. B 52, R5467 (1995).
-.. [Anasimov] S. L. Dudarev, G. A. Botton, S. Y. Savrasov, C. J. Humphreys
-              and A. P. Sutton, Phys. Rev. B 57, 1505 (1998).
+.. [Dudarev] S. L. Dudarev, G. A. Botton, S. Y. Savrasov, C. J. Humphreys
+             and A. P. Sutton, Phys. Rev. B 57, 1505 (1998).

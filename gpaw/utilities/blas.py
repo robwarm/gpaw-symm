@@ -159,7 +159,7 @@ def czher(alpha, x, a):
     _gpaw.czher(alpha, x, a)
 
 
-def rk(alpha, a, beta, c):
+def rk(alpha, a, beta, c, trans='c'):
     """Rank-k update of a matrix.
 
     Performs the operation::
@@ -186,9 +186,12 @@ def rk(alpha, a, beta, c):
             a.dtype == complex and c.dtype == complex)
     assert a.flags.contiguous
     assert a.ndim > 1
-    assert c.shape == (a.shape[0], a.shape[0])
+    if trans == 'n':
+        assert c.shape == (a.shape[1], a.shape[1])
+    else:
+        assert c.shape == (a.shape[0], a.shape[0])
     assert c.strides[1] == c.itemsize
-    _gpaw.rk(alpha, a, beta, c)
+    _gpaw.rk(alpha, a, beta, c, trans)
 
     
 def r2k(alpha, a, b, beta, c):

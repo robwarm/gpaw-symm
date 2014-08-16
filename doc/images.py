@@ -21,6 +21,7 @@ srcpath = 'http://wiki.fysik.dtu.dk/gpaw-files'
 agtspath = 'http://wiki.fysik.dtu.dk'
 jjwww = 'http://dcwww.camp.dtu.dk/~jensj'  # should that be in srcpath?
 
+
 def get(path, names, target=None, source=None):
     """Get files from web-server.
 
@@ -43,7 +44,7 @@ def get(path, names, target=None, source=None):
                 sink.write(data)
                 sink.close()
                 print 'OK'
-                got_something = True                
+                got_something = True
             except HTTPError:
                 print 'HTTP Error!'
     return got_something
@@ -86,10 +87,8 @@ get('devel', ['bslogo.png', 'overview.png', 'stat.png'])
 # Note: bz-all.png is used both in an exercise and a tutorial.  Therefore
 # we put it in the common dir so far, rather than any of the two places
 get('.', ['bz-all.png'], '_static')
-get('exercises/band_structure', ['silicon_banddiagram.png'])
 get('exercises/wavefunctions', ['co_bonding.jpg'])
 
-get('tutorials/bandstructures', ['sodium_bands.png'])
 get('tutorials/H2', ['ensemble.png'])
 
 get('.', ['2sigma.png', 'co_wavefunctions.png', 'molecules.png'], '_static')
@@ -97,8 +96,6 @@ get('exercises/lrtddft', ['spectrum.png'])
 get('documentation/xc', 'g2test_pbe0.png  g2test_pbe.png  results.png'.split())
 get('performance', 'dacapoperf.png  goldwire.png  gridperf.png'.split(),
     '_static')
-
-get('tutorials/negfstm', ['fullscan.png', 'linescan.png'])
 
 get('tutorials/xas', ['h2o_xas_3.png', 'h2o_xas_4.png'])
 
@@ -114,7 +111,8 @@ scf_dcdft_pbe_pw_calculator_steps.png
 scf_dcdft_pbe_pw_energy.csv
 """.split()
 
-get('agts-files', scf_conv_eval_stuff, target='documentation/scf_conv_eval', source=agtspath)
+get('agts-files', scf_conv_eval_stuff, target='documentation/scf_conv_eval',
+    source=agtspath)
 
 # Warning: for the moment dcdft runs are not run (files are static)!
 dcdft_pbe_gpaw_pw_stuff = """
@@ -151,6 +149,7 @@ pbe_nwchem_def2_qzvppd_opt_ea_vs.csv pbe_nwchem_def2_qzvppd_opt_distance_vs.csv
 
 get('agts-files', g2_1_stuff, target='setups', source=agtspath)
 
+
 def setup(app):
     # Generate one page for each setup:
     if get('setups', ['setups-data.tar.gz'], '_static'):
@@ -159,37 +158,6 @@ def setup(app):
         print 'Generating setup pages ...'
         os.system('cd setups; %s make_setup_pages.py' % executable)
 
-    # Retrieve latest code coverage pages:
-    if get('.', ['gpaw-coverage-latest.tar.gz'], '_static',
-           source='http://dcwww.camp.dtu.dk/~chlg'):
-        print 'Extracting coverage pages ...'
-        os.system('tar -C devel -xzf _static/gpaw-coverage-latest.tar.gz')
-
-    # Fallback in case coverage pages were not found
-    if not os.path.isfile('devel/testsuite.rst'):
-        open('devel/testsuite.rst', 'w').write( \
-            '\n'.join(['.. _testsuite:',
-                       '', '==========', 'Test suite', '==========',
-                       '', '.. warning::', '   Coverage files not found!']))
-    if not os.path.isdir('devel/coverage'):
-        os.mkdir('devel/coverage', 0755)
-    if not os.path.isfile('devel/coverage/index.rst'):
-        open('devel/coverage/index.rst', 'w').write( \
-            '\n'.join(['-----------------------------------',
-                       'List of files with missing coverage',
-                       '-----------------------------------',
-                       '', 'Back to :ref:`code coverage <coverage>`.',
-                       '', '.. warning::', '   Coverage files not found!']))
-    if not os.path.isfile('devel/coverage/ranking.txt'):
-        open('devel/coverage/ranking.txt', 'w').write( \
-            '\n'.join(['-------------------------------------',
-                       'Distribution of coverage by developer',
-                       '-------------------------------------',
-                       '', '.. warning::', '   Coverage files not found!']))
-    if not os.path.isfile('devel/coverage/summary.txt'):
-        open('devel/coverage/summary.txt', 'w').write( \
-            '\n'.join(['-------', 'Summary', '-------',
-                       '', '.. warning::', '   Coverage files not found!']))
 
     # Get png files and other stuff from the AGTS scripts that run
     # every weekend:
@@ -198,23 +166,26 @@ def setup(app):
     queue.collect()
     names = set()
     for job in queue.jobs:
-        if job.creates:
-            for name in job.creates:
-                assert name not in names, "Name '%s' clashes!" % name
-                names.add(name)
-                # the files are saved by the weekly tests under agtspath/agts-files
-                # now we are copying them back to their original run directories
-                print os.path.join(job.dir, name) + ' copied from ' + agtspath
-                get('agts-files', [name], job.dir, source=agtspath)
+        if not job.creates:
+            continue
+        for name in job.creates:
+            assert name not in names, "Name '%s' clashes!" % name
+            names.add(name)
+            # the files are saved by the weekly tests under agtspath/agts-files
+            # now we are copying them back to their original run directories
+            path = os.path.join(job.dir, name)
+            if os.path.isfile(path):
+                continue
+            print(path, 'copied from', agtspath)
+            get('agts-files', [name], job.dir, source=agtspath)
 
     # Get files that we can't generate:
-    for dir, file in [
-        ('.', 'camd.png'),
-        ('tutorials/xas', 'xas_illustration.png'),
-        ('tutorials/xas', 'xas_h2o_convergence.png'),
-        ('install/BGP', 'bgp_mapping_intranode.png'),  
-        ('install/BGP', 'bgp_mapping1.png'),
-        ('install/BGP', 'bgp_mapping2.png'),
-        ('devel', 'bigpicture.png'),
-        ('_build', 'bigpicture.svg')]:
+    for dir, file in [('.', 'camd.png'),
+                      ('tutorials/xas', 'xas_illustration.png'),
+                      ('tutorials/xas', 'xas_h2o_convergence.png'),
+                      ('install/BGP', 'bgp_mapping_intranode.png'),
+                      ('install/BGP', 'bgp_mapping1.png'),
+                      ('install/BGP', 'bgp_mapping2.png'),
+                      ('devel', 'bigpicture.png'),
+                      ('_build', 'bigpicture.svg')]:
         get('gpaw-stuff', [file], dir, jjwww)

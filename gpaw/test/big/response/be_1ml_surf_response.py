@@ -12,7 +12,7 @@ from ase.parallel import paropen
 from gpaw import GPAW
 from gpaw.mpi import serial_comm, rank, size
 from gpaw.utilities import devnull
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 
 if rank != 0:
   sys.stdout = devnull 

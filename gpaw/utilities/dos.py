@@ -10,7 +10,6 @@ from gpaw.io.fmf import FMF
 from gpaw.utilities.blas import gemmdot
 from itertools import izip
 
-import gpaw.mpi as mpi
 
 def print_projectors(setup):
     """Print information on the projectors of input nucleus object.
@@ -35,12 +34,13 @@ def print_projectors(setup):
     print '--------'
     i = 0
     for n, l in zip(n_j, l_j):
-        for m in range(2*l+1):
+        for m in range(2 * l + 1):
             if n == -1:
                 n = '*'
             print '%2s %s %s_%s' % (i, n, 'spdf'[l], angular[l][m])
             i += 1
 
+            
 def number_of_projectors(setup):
     """Returns the number of the bound state projectors.
 
@@ -56,11 +56,12 @@ def number_of_projectors(setup):
     
     i = 0
     for n, l in zip(n_j, l_j):
-        for m in range(2*l+1):
+        for m in range(2 * l + 1):
             if n != -1:
                 i += 1
     return i
 
+    
 def get_angular_projectors(setup, angular, type='bound'):
     """Determine the projector indices which have specified angula
     quantum number.
@@ -88,15 +89,17 @@ def get_angular_projectors(setup, angular, type='bound'):
 
     return projectors
 
+    
 def delta(x, x0, width, mode='Gauss'):
     """Return a gaussian of given width centered at x0."""
     if mode == 'Gauss':
         return np.exp(np.clip(-((x - x0) / width)**2,
                               -100.0, 100.0)) / (sqrt(pi) * width)
     if mode == 'Lorentz':
-        return (2 / pi / width) / ((np.clip(((x - x0) / (width/2))**2,
-                                           -100.0, 100.0)) + 1)
+        return (2 / pi / width) / ((np.clip(((x - x0) / (width / 2))**2,
+                                            -100.0, 100.0)) + 1)
 
+        
 def fold(energies, weights, npts, width, mode='Gauss'):
     """Take a list of energies and weights, and sum a delta function
     for each."""
@@ -108,6 +111,7 @@ def fold(energies, weights, npts, width, mode='Gauss'):
         dos_e += w * delta(e, e0, width, mode=mode)
     return e, dos_e
 
+    
 def raw_orbital_LDOS(paw, a, spin, angular='spdf'):
     """Return a list of eigenvalues, and their weight on the specified atom.
 
@@ -155,6 +159,7 @@ def raw_orbital_LDOS(paw, a, spin, angular='spdf'):
                                  indices=projectors, axis=1), axis=1)
         return energies, weights
 
+        
 def all_electron_LDOS(paw, mol, spin, lc=None, wf_k=None, P_aui=None):
     """Returns a list of eigenvalues, and their weights on a given molecule
     
@@ -174,7 +179,6 @@ def all_electron_LDOS(paw, mol, spin, lc=None, wf_k=None, P_aui=None):
     w_k = paw.wfs.weight_k
     nk = len(w_k)
     nb = paw.wfs.bd.nbands
-    ns = paw.wfs.nspins
     
     P_kn = np.zeros((nk, nb), np.complex)
     if wf_k is None:
@@ -214,6 +218,7 @@ def all_electron_LDOS(paw, mol, spin, lc=None, wf_k=None, P_aui=None):
         
     return energies, weights
 
+    
 def get_all_electron_IPR(paw):
     density = paw.density
     wfs = paw.wfs
@@ -257,8 +262,7 @@ def get_all_electron_IPR(paw):
             print "%5i %5i %10.5f %10.5f" % (k, n, eps, ipr/norm**2)
     print "-"*35
             
-            
-                    
+                            
 def raw_wignerseitz_LDOS(paw, a, spin):
     """Return a list of eigenvalues, and their weight on the specified atom"""
     wfs = paw.wfs

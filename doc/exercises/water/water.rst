@@ -21,7 +21,7 @@ Read the script and try to understand what it does.  A few notes:
    Thus, *indentation determines control flow*.
 
  * In this case we conveniently load the geometry from the G2 database
-   of small molecules, using the :meth:`~ase.structure.molecule`
+   of small molecules, using the :func:`~ase.structure.molecule`
    function from ASE.
 
  * By setting the ``txt`` parameter, we specify a file where GPAW will save
@@ -158,6 +158,20 @@ the energy variational with respect to the quality of the basis?
 
 LCAO calculations do not in fact produce very precise binding energies
 (although these can be improved considerably by manually generating
-optimized bsis functions) - however the method is well suited
+optimized basis functions) - however the method is well suited
 to calculate geometries, and for applications that require a small basis
 set, such as electron transport calculations.
+
+
+Plane-wave calculations
+=======================
+
+For systems with small unit-cells, it can be much faster to expand the
+wave-functions in :ref:`plane-waves <manual_mode>`.  Try running a calculation
+for a water molecule with a plane-wave cutoff of 350 eV using this::
+    
+    from gpaw import GPAW, PW
+    calc = GPAW(mode=PW(350), ...)
+
+Try to look at the text output and see if you can find the number of
+plane-waves used.

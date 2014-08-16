@@ -27,6 +27,15 @@ def equal(x, y, tolerance=0, fail=True, msg=''):
             sys.stderr.write('WARNING: %s\n' % msg)
 
 
+def findpeak(x, y):
+    dx = x[1] - x[0]
+    i = y.argmax()
+    a, b, c = np.polyfit([-1, 0, 1], y[i - 1:i + 2], 2)
+    assert a < 0
+    x = -0.5 * b / a
+    return dx * (i + x), a * x**2 + b * x + c
+
+    
 def gen(symbol, exx=False, name=None, **kwargs):
     if mpi.rank == 0:
         if 'scalarrel' not in kwargs:
@@ -185,7 +194,8 @@ tests = [
     'multipoleH2O.py',
     'bulk.py',
     'elf.py',
-    'aluminum_EELS.py',
+    'aluminum_EELS_RPA.py',
+    'aluminum_EELS_ALDA.py',
     'H_force.py',
     'parallel/lcao_hamiltonian.py',
     'fermisplit.py',
@@ -239,6 +249,7 @@ tests = [
     'test_ibzqpt.py',
     'aedensity.py',
     'fd2lcao_restart.py',
+    'gwsi.py',
     #'graphene_EELS.py', disabled while work is in progress on response code
     'lcao_bsse.py',
     'pplda.py',
@@ -258,7 +269,6 @@ tests = [
     'Al2_lrtddft.py',
     'rpa_energy_Si.py',
     '2Al.py',
-    'jstm.py',
     'tpss.py',
     'be_nltd_ip.py',
     'si_xas.py',
@@ -267,6 +277,7 @@ tests = [
     'ralda_energy_H2.py',
     'ralda_energy_N2.py',
     'ralda_energy_Ni.py',
+    'ralda_energy_Si.py',
     'Cu.py',
     'restart_band_structure.py',
     'ne_disc.py',
@@ -276,11 +287,11 @@ tests = [
     'muffintinpot.py',
     'diamond_gllb.py',
     'h2o_dks.py',
-    'aluminum_EELS_lcao.py',
     'gw_ppa.py',
     'nscfsic.py',
     'gw_static.py',
     # > 100 sec tests start here (add tests after exx.py!)
+    'response_na_plasmon.py',
     'exx.py',
     'pygga.py',
     'dipole.py',
@@ -323,18 +334,17 @@ tests = [
     'parallel/scalapack_mpirecv_crash.py',
     'parallel/realspace_blacs.py',
     'AA_exx_enthalpy.py',
-     #'usesymm2.py',
-     #'eigh_perf.py', # Requires LAPACK 3.2.1 or later
-     # XXX https://trac.fysik.dtu.dk/projects/gpaw/ticket/230
-     #'parallel/scalapack_pdlasrt_hang.py',
-     #'dscf_forces.py',
-     #'stark_shift.py',
+    #'usesymm2.py',
+    #'eigh_perf.py', # Requires LAPACK 3.2.1 or later
+    # XXX https://trac.fysik.dtu.dk/projects/gpaw/ticket/230
+    #'parallel/scalapack_pdlasrt_hang.py',
+    #'dscf_forces.py',
+    #'stark_shift.py',
     'cmrtest/cmr_test.py',
     'cmrtest/cmr_test3.py',
     'cmrtest/cmr_test4.py',
     'cmrtest/cmr_append.py',
-    'cmrtest/Li2_atomize.py'
-    ]
+    'cmrtest/Li2_atomize.py']
 
 exclude = []
 
@@ -394,12 +404,14 @@ if mpi.size != 1 and not compiled_with_sl():
     exclude += ['ralda_energy_H2.py',
                 'ralda_energy_N2.py',
                 'ralda_energy_Ni.py',
+                'ralda_energy_Si.py',
                 'bse_sym.py',
-                'bse_silicon.py']
-
-if not compiled_with_sl():
-    exclude += ['pw/fulldiag.py',
-                'pw/fulldiagk.py']
+                'bse_silicon.py',
+                'gwsi.py',
+                'rpa_energy_N2.py',
+                'pw/fulldiag.py',
+                'pw/fulldiagk.py',
+                'au02_absorption.py']
 
 if mpi.size == 8:
     exclude += ['transport.py']

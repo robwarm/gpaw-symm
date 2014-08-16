@@ -1,56 +1,67 @@
 import numpy as np
-import sys
-import time
-
 from ase.units import Bohr
 from ase.lattice import bulk
 from gpaw import GPAW, FermiDirac
-from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
-from gpaw.mixer import Mixer
-from gpaw.atom.basis import BasisMaker
-from gpaw.response.df import DF
-from gpaw.mpi import serial_comm, rank, size
-from gpaw.utilities import devnull
+from gpaw.response.df import DielectricFunction
+from gpaw.test import equal, findpeak
 
-
-if rank != 0:
-  sys.stdout = devnull 
-
-# GS Calculation One
 a = 6.75 * Bohr
 atoms = bulk('C', 'diamond', a=a)
 
-calc = GPAW(h=0.2,
-            eigensolver=RMM_DIIS(),
-            mixer=Mixer(0.1,3),
-            kpts=(4,4,4),
+calc = GPAW(mode='pw',
+            kpts=(3, 3, 3),
+            eigensolver='rmm-diis',
             occupations=FermiDirac(0.001))
 
 atoms.set_calculator(calc)
 atoms.get_potential_energy()
-calc.write('C.gpw','all')
+calc.write('C.gpw', 'all')
 
 # Macroscopic dielectric constant calculation
-q = np.array([0.0, 0.00001, 0.])
-w = np.linspace(0, 24., 241)
-
-df = DF(calc='C.gpw', q=q, w=(0.,), eta=0.001,
-        ecut=50, hilbert_trans=False, optical_limit=True)
+df = DielectricFunction('C.gpw', frequencies=(0.,), eta=0.001, ecut=200,
+                        hilbert=False)
 eM1, eM2 = df.get_macroscopic_dielectric_constant()
 
-eM1_ = 6.15176021 #6.15185095143 for dont use time reversal symmetry
-eM2_ = 6.04805705 #6.04815084635
+eM1_ = 9.725
+eM2_ = 9.068
 
-if (np.abs(eM1 - eM1_) > 1e-5 or
-    np.abs(eM2 - eM2_) > 1e-5):
-    print eM1, eM2
-    raise ValueError('Macroscopic dielectric constant not correct ! ')
-
+equal(eM1, eM1_, 0.01)
+equal(eM2, eM2_, 0.01)
 
 # Absorption spectrum calculation
-del df
-df = DF(calc='C.gpw', q=q, w=w, eta=0.25,
-        ecut=50, optical_limit=True, txt='C_df.out')
-df.get_absorption_spectrum()
-df.check_sum_rule()
-df.write('C_df.pckl')
+df = DielectricFunction('C.gpw', eta=0.25, ecut=200,
+                        frequencies=np.linspace(0, 24., 241), hilbert=False)
+b0, b = df.get_dielectric_function(filename=None)
+df.check_sum_rule(b.imag)
+
+equal(b0[0].real, eM1_, 0.01)
+equal(b[0].real, eM2_, 0.01)
+
+a0, a = df.get_polarizability(wigner_seitz_truncation=False,
+                              filename=None)
+a0_ws, a_ws = df.get_polarizability(wigner_seitz_truncation=True,
+                                    filename=None)
+w0_ = 10.778232265664668
+I0_ = 5.5467658790816268
+w_ = 10.9530497246
+I_ = 6.09704008088
+
+w, I = findpeak(np.linspace(0, 24., 241), b0.imag)
+equal(w, w0_, 0.05)
+equal(I / (4 * np.pi), I0_, 0.05)
+w, I = findpeak(np.linspace(0, 24., 241), a0.imag)
+equal(w, w0_, 0.05)
+equal(I, I0_, 0.05)
+w, I = findpeak(np.linspace(0, 24., 241), a0_ws.imag)
+equal(w, w0_, 0.05)
+equal(I, I0_, 0.05)
+w, I = findpeak(np.linspace(0, 24., 241), b.imag)
+equal(w, w_, 0.05)
+equal(I / (4 * np.pi), I_, 0.05)
+w, I = findpeak(np.linspace(0, 24., 241), a.imag)
+equal(w, w_, 0.05)
+equal(I, I_, 0.05)
+# The Wigner-Seitz truncation does not give exactly the same for kpts=(3,3,3)
+w, I = findpeak(np.linspace(0, 24., 241), a_ws.imag)
+equal(w, w_, 0.1)
+equal(I, I_, 0.1)

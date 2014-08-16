@@ -5,7 +5,7 @@ Kohn-Sham wavefunctions of the oxygen atom and CO molecule
 In this section we will look at the Kohn-Sham wavefunctions of the O
 atom and CO molecule and compare them to results from molecular orbital theory.
 
-* The first script :svn:`~doc/exercises/wavefunctions/O.py` sets up an oxygen
+* The first script :download:`O.py` sets up an oxygen
   atom in a cubic supercell with non-periodic boundary conditions and 
   calculates the total energy. A couple of extra bands (i.e. Kohn-Sham 
   states) are included in the calculation:
@@ -14,31 +14,30 @@ atom and CO molecule and compare them to results from molecular orbital theory.
 
 .. highlight:: bash
 
-* In this case we modify the Pulay density mixer.  Adjusting the mixer can
-  sometimes help the calculation converge - see :ref:`densitymix`.
-
 * Towards the end, a :file:`.gpw` file is written with the Kohn-Sham
-  wavefunctions by ``calc.write('O.gpw', mode='all')``.
-  At the very end we write the Kohn-Sham
-  wavefunctions to :file:`.cube` files for
-  handling with the :program:`VMD` program.
+  wavefunctions by ``calc.write('O.gpw', mode='all')`` and also some cube
+  files containing individual orbatals are written.
 
-* Run the script and check the output file. What are the occupation numbers
-  for the free oxygen atom?
+* Run the script and check the text-output file. What are the occupation
+  numbers for the free oxygen atom?
 
-* The orbitals can be visualized in :program:`VMD`. 
-  Load all of the wavefunctions into :program:`VMD`
-  simultaneously, by running :samp:`vmd O{?}.cube`. In :program:`VMD` choose
-  :menuselection:`Graphics --> Representations`, click
-  :guilabel:`Create Rep`, then choose
-  :menuselection:`Drawing Method --> isosurface`.  In the
-  :guilabel:`Data Set` field, you can then
-  choose between all the saved wavefunctions.
+* The orbitals can be visualized using Mayavi_ and its
+  :func:`mayavi.mlab.contour3d` function and the GPAW-calculators
+  :meth:`~gpaw.aseinterface.GPAW.get_pseudo_wave_function` method.
+  Reload the gpw-file and look at one of the orbitals like this::
+    
+      from gpaw import GPAW
+      from mayavi import mlab
+      calc = GPAW('O.gpw', txt=None)
+      lumo = calc.get_pseudo_wave_function(band=2, spin=1)
+      mlab.contour3d(lumo)
+      mlab.show()
 
+  For an alternative way of viewing the orbitals, see :ref:`iso`.
+  
   Can you identify the highest occupied state and the lowest unoccupied state?
 
-  How do your wavefunctions compare to a molecular orbital picture?
-
+  How do your wavefunctions compare to atomic s- and p-orbitals?
   
 * Make a script where a CO molecule is placed in the center of a cubic
   unit cell with non-periodic boundary conditions, e.g. of 6 Å. For
@@ -48,8 +47,8 @@ atom and CO molecule and compare them to results from molecular orbital theory.
   calculation (what is the number of valence electrons in CO?).
   You can quickly create the Atoms object with the CO molecule by::
   
-    $ from ase.structure import molecule
-    $ CO = molecule('CO')
+      from ase.structure import molecule
+      CO = molecule('CO')
   
   This will create a CO molecule with an approximately correct bond length
   and the correct magnetic moments on each atom.
@@ -59,18 +58,21 @@ atom and CO molecule and compare them to results from molecular orbital theory.
   the final results to a :file:`.gpw` file. The wavefunctions
   are not written to the :file:`.gpw` file by default, but can again be saved by
   writing :samp:`{calc}.write('CO.gpw', mode='all')`, where :samp:`{calc}` is
-  the calculator object. The trajectory can be viewed by::
+  the calculator object. Assuming you use
+  :samp:`opt = QuasiNewton(..., trajectory='CO.traj')`, the trajectory
+  can be viewed by::
 
     $ ase-gui CO.traj
 
-  Mark the two atoms to see the bond length.
+  Try looking at the file while the optimization is running and mark the
+  two atoms to see the bond length.
 
 * As this is a calculation of a molecule, one should get integer
   occupation numbers - check this in the text output.  What electronic
   temperature was used and what is the significance of this?
 
 * Plot the Kohn-Sham wavefunctions of the different wavefunctions of the CO
-  molecule by after writing :file:`.cube` files for handling with :program:`VMD`.
+  molecule like you did for the oxygen atom.
 
 * Can you identify the highest occupied state and the lowest unoccupied state?
 
@@ -86,4 +88,6 @@ atom and CO molecule and compare them to results from molecular orbital theory.
   .. figure:: co_bonding.jpg
      :align: center
 
-.. _The Chemogenesis Web Book: http://www.meta-synthesis.com/webbook/39_diatomics/diatomics.html#CO
+.. _Mayavi: http://docs.enthought.com/mayavi/mayavi/index.html
+.. _The Chemogenesis Web Book: http://www.meta-synthesis.com/webbook/
+                               39_diatomics/diatomics.html#CO

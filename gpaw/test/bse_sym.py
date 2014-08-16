@@ -2,7 +2,7 @@ import os
 import numpy as np
 from ase.lattice import bulk
 from gpaw import GPAW
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 from ase.dft.kpoints import monkhorst_pack
 from gpaw.response.bse import BSE
 from gpaw.mpi import rank, size

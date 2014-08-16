@@ -1,31 +1,30 @@
 #!/usr/bin/python
 import os
 import sys
-import time
 import glob
-import trace
 import tempfile
 
 if '--dir' in sys.argv:
     i = sys.argv.index('--dir')
-    dir = sys.argv[i+1]
+    dir = sys.argv[i + 1]
 else:
     dir = None
 
 if '--email' in sys.argv:
     i = sys.argv.index('--email')
-    email = sys.argv[i+1]
+    email = sys.argv[i + 1]
 else:
     email = None
 
 if '--tarfiledir' in sys.argv:
     i = sys.argv.index('--tarfiledir')
-    tarfiledir = sys.argv[i+1]
+    tarfiledir = sys.argv[i + 1]
 else:
     tarfiledir = None
 
 tmpdir = tempfile.mkdtemp(prefix='gpaw-sphinx-', dir=dir)
 os.chdir(tmpdir)
+
 
 def build():
     if os.system('svn export ' +
@@ -42,10 +41,11 @@ def build():
     if os.system('python setup.py install --home=.. 2> error') != 0:
         raise RuntimeError('Installation of GPAW failed!')
 
-    os.system('wget --no-check-certificate --quiet ' +
-              'http://wiki.fysik.dtu.dk/gpaw-files/gpaw-setups-latest.tar.gz')
+    assert os.system('wget --no-check-certificate --quiet ' +
+                     'http://wiki.fysik.dtu.dk/gpaw-files/' +
+                     'gpaw-setups-latest.tar.gz') == 0
 
-    os.system('tar xvzf gpaw-setups-latest.tar.gz')
+    assert os.system('tar xvzf gpaw-setups-latest.tar.gz') == 0
 
     setups = tmpdir + '/gpaw/' + glob.glob('gpaw-setups-[0-9]*')[0]
 
@@ -68,8 +68,9 @@ def build():
         fd.write(''.join(errors))
         fd.close()
         if email is not None:
-            x = os.system('mail -s "GPAW: EpyDoc errors" %s < epydoc.errors' % email)
-            assert x == 0
+            assert os.system(
+                'mail -s "GPAW: EpyDoc errors" %s < epydoc.errors' %
+                email) == 0
 
     # ase installs under lib independently of the platform
     sys.path.insert(0, '%s/lib/python' % tmpdir)
@@ -82,14 +83,15 @@ def build():
     from gpaw.version import version
 
     os.chdir('doc')
-    os.system('sed -i s/gpaw-snapshot/gpaw-%s/ download.rst' % version)
+    assert os.system('sed -i s/gpaw-snapshot/gpaw-%s/ download.rst' %
+                     version) == 0
     os.mkdir('_build')
-    if os.system('PYTHONPATH=%s/%s/python:%s/lib/python ' % \
+    if os.system('PYTHONPATH=%s/%s/python:%s/lib/python ' %
                  (tmpdir, libdir, tmpdir) +
                  'GPAW_SETUP_PATH=%s ' % setups +
                  'sphinx-build . _build') != 0:
         raise RuntimeError('Sphinx failed!')
-    os.system('cd _build; cp _static/searchtools.js .')
+    assert os.system('cd _build; cp _static/searchtools.js .') == 0
 
     if 0:
         if os.system('sphinx-build -b latex . _build') != 0:

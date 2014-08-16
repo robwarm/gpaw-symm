@@ -124,6 +124,9 @@ class Cluster:
         fd.write('wrap_pylab(%s)\n' % job.show)
         fd.write('execfile(%r)\n' % job.script)
         fd.close()
+        
+    def tick(self, nrunning):
+        pass
 
 
 class TestCluster(Cluster):
@@ -148,6 +151,26 @@ class TestCluster(Cluster):
                     cmd += 'echo 42 > %s; ' % os.path.join(job.dir, filename)
             cmd += 'echo %d > %s.done' % (exitcode, job.absname)
         os.system('(%s)&' % cmd)
+
+
+class LocalCluster(Cluster):
+    def __init__(self):
+        self.queue = []
+        
+    def submit(self, job):
+        self.queue.append(job)
+        
+    def tick(self, nrunning):
+        if self.queue and nrunning == 0:
+            job = self.queue.pop(0)
+            dir = os.getcwd()
+            os.chdir(job.dir)
+            self.write_pylab_wrapper(job)
+            os.system('(touch %s.start;' % job.name +
+                      'python %s.py %s > %s.output;' %
+                      (job.script, job.args, job.name) +
+                      'echo $? > %s.done)&' % job.name)
+            os.chdir(dir)
 
 
 class AGTSQueue:
@@ -263,13 +286,18 @@ class AGTSQueue:
 
             time.sleep(self.sleeptime)
 
+            nrunning = 0
             for job in jobs:
                 newstatus = job.check_status()
                 if newstatus:
                     self.log(job)
                     if newstatus in ['TIMEOUT', 'FAILED']:
                         self.fail(job)
+                if job.status == 'running':
+                    nrunning += 1
 
+            cluster.tick(nrunning)
+                        
         t = self.get_cpu_time()
         self.fd.write('CPU time: %d:%02d:%02d\n' %
                       (t // 3600, t // 60 % 60, t % 60))
@@ -279,7 +307,8 @@ class AGTSQueue:
     def status(self):
         fd = open('status.log', 'w')
         fd.write('# job                                              ' +
-                 20*' ' + 'status      time   tmax ncpus  deps files id\n')
+                 20 * ' ' +
+                 'status      time   tmax ncpus  deps files id\n')
         for job in self.jobs:
             if job.tstop is not None:
                 t = '%5d' % round(job.tstop - job.tstart)
@@ -377,8 +406,10 @@ def main():
         elif opt.run == 'niflheim':
             from gpaw.test.big.niflheim import NiflheimCluster
             cluster = NiflheimCluster()
+        elif opt.run == 'local':
+            cluster = LocalCluster()
         else:
-            bad
+            1 / 0
 
         queue.run(cluster)
 

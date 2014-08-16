@@ -4,14 +4,15 @@ import os
 import time
 from ase.units import Bohr
 from ase.lattice import bulk
-from gpaw import GPAW
+from gpaw import GPAW, PW
+from gpaw.test import findpeak
 from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import Mixer
 from gpaw.atom.basis import BasisMaker
-from gpaw.response.df import DF
+from gpaw.response.df import DielectricFunction
 from gpaw.mpi import serial_comm, rank, size
 from gpaw.utilities import devnull
-
+from gpaw.wavefunctions.pw import PW
 
 if rank != 0:
   sys.stdout = devnull 
@@ -25,12 +26,11 @@ t1 = time.time()
 a = 4.043
 atoms = bulk('Al', 'fcc', a=a)
 atoms.center()
-calc = GPAW(h=0.2,
+calc = GPAW(mode=PW(200),
             eigensolver=RMM_DIIS(),
             mixer=Mixer(0.1,3),
             kpts=(4,4,4),
-            parallel={'domain':1,
-                      'band':1},
+            parallel={'band':1},
             idiotproof=False,  # allow uneven distribution of k-points
             xc='LDA')
 
@@ -42,26 +42,48 @@ t2 = time.time()
 q = np.array([1/4.,0.,0.])
 w = np.linspace(0, 24, 241)
 
-df = DF(calc=calc, q=q, w=w, eta=0.2, ecut=(50,50,50))
-df.get_EELS_spectrum(filename='EELS_Al')
-df.check_sum_rule()
-df.write('Al.pckl')
+df = DielectricFunction(calc=calc, frequencies=w, eta=0.2, ecut=50)
+eels_NLFC_w, eels_LFC_w = df.get_eels_spectrum(filename='EELS_Al', q_c=q)
+df_NLFC_w, df_LFC_w = df.get_dielectric_function(q_c=q)
+
+
+df.check_sum_rule(spectrum=np.imag(df_NLFC_w))
+df.check_sum_rule(spectrum=np.imag(df_LFC_w))
+
+df.check_sum_rule(spectrum=eels_NLFC_w)
+df.check_sum_rule(spectrum=eels_LFC_w)
+#df.write('Al.pckl')
 
 t3 = time.time()
 
+print ''
 print 'For ground  state calc, it took', (t2 - t1) / 60, 'minutes'
 print 'For excited state calc, it took', (t3 - t2) / 60, 'minutes'
 
-d = np.loadtxt('EELS_Al')
-wpeak = 15.7 # eV
-Nw = 157
-if d[Nw, 1] > d[Nw-1, 1] and d[Nw, 2] > d[Nw+1, 2]:
+d = np.loadtxt('EELS_Al',delimiter=',')
+
+# New results are compared with test values
+wpeak1,Ipeak1 = findpeak(d[:,0],d[:,1])
+wpeak2,Ipeak2 = findpeak(d[:,0],d[:,2])
+
+test_wpeak1 = 15.70 # eV
+test_Ipeak1 = 29.05 # eV
+test_wpeak2 = 15.725 # eV
+test_Ipeak2 = 26.41 # eV
+
+
+if np.abs(test_wpeak1-wpeak1)<1e-2 and np.abs(test_wpeak2-wpeak2)<1e-2:
     pass
 else:
+    print test_wpeak1-wpeak1,test_wpeak2-wpeak2
     raise ValueError('Plasmon peak not correct ! ')
 
-if (np.abs(d[Nw, 1] - 28.8932274034) > 1e-5
-    or np.abs(d[Nw, 2] -  25.9806674277) > 1e-5):
-    print d[Nw, 1], d[Nw, 2]
+if np.abs(test_Ipeak1-Ipeak1)>1e-2 or np.abs(test_Ipeak2-Ipeak2)>1e-2:
+    print Ipeak1-test_Ipeak1, Ipeak2-test_Ipeak2
     raise ValueError('Please check spectrum strength ! ')
+
+
+
+
+
 

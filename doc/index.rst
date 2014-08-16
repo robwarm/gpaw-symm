@@ -1,66 +1,50 @@
-==========================================
-Grid-based projector-augmented wave method
-==========================================
+===============================================================
+GPAW: DFT and beyond within the projector-augmented wave method
+===============================================================
 
 GPAW is a density-functional theory (DFT) Python_ code based on the
 projector-augmented wave (:ref:`PAW <literature>`) method and the
 atomic simulation environment (ASE_).  It uses real-space uniform
-grids and multigrid methods or atom-centered basis-functions.  Read
-more about :ref:`its features and the algorithms used
-<features_and_algorithms>`.
+grids and multigrid methods, atom-centered basis-functions or plane-waves.
+Read more about the :ref:`algorithms` used.
 
 .. _Python: http://www.python.org
 .. _ASE: https://wiki.fysik.dtu.dk/ase
 
-.. |i0| image:: _static/logo-anl.png
-        :height: 44 px
-        :target: http://www.anl.gov
-.. |i1| image:: _static/logo-dtu.png
-        :height: 44 px
-        :target: http://www.fysik.dtu.dk/english/Research/CAMD
-.. |i2| image:: _static/logo-csc.png
-        :height: 44 px
-        :target: http://www.csc.fi
-.. |i3| image:: _static/logo-aalto.png
-        :height: 44 px
-        :target: http://physics.aalto.fi
-.. |i4| image:: _static/logo-jyu.png
-        :height: 44 px
-        :target: http://www.phys.jyu.fi
-.. |i5| image:: _static/logo-fmf.png
-        :height: 44 px
-        :target: http://www.fmf.uni-freiburg.de
-.. |i6| image:: _static/logo-tut.png
-        :height: 44 px
-        :target: http://www.tut.fi
-.. |i7| image:: _static/logo-suncat.png
-        :height: 22 px
-        :align: middle
-        :target: http://suncat.stanford.edu
-.. |i8| image:: _static/logo-slac-center.png
-        :height: 38 px
-        :target: http://suncat.stanford.edu
-.. |i9| image:: _static/logo-prace.png
-        :height: 44 px
-        :target: http://http://www.prace-ri.eu/
 
+Quick links to all features:
+    
+.. list-table::
+    
+    * - :ref:`Plane-waves <manual_mode>`
+      - :ref:`Finite-difference <manual_stencils>`
+      - :ref:`LCAO <lcao>`
+    * - :ref:`XC-functionals <xc>`
+      - :ref:`DFT+U <hubbardu>`
+      - :ref:`GLLB-SC <bandgab>`
+    * - :ref:`DOS <pdos>`
+      - :ref:`STM <stm tutorial>`
+      - :ref:`Wannier functions <wannier>`
+    * - :ref:`delta-SCF <dscf>`
+      - :ref:`XAS <xas>`
+      - :ref:`Jellium <jellium>`
+    * - :ref:`TDDFT <timepropagation>`
+      - :ref:`LRTDDFT (molecules) <lrtddft>`
+      - :ref:`LRTDDFT (extended systems) <df_theory>`
+    * - :ref:`Transport <transport_exercise>`
+      - :ref:`NEGF-transport <transport>`
+      - :ref:`Keldysh GF-transport ... <keldyshgf>`
+    * - :ref:`RPA-correlation <rpa>`
+      - :ref:`GW <gw_theory>`
+      - :ref:`BSE <bse>`
+    * - :ref:`Parallelization <parallel_runs>`
+      -
+      -
 
+Watch us on GPAWTV
+==================
 
-|i0| |i1| |i2| |i3| |i4| |i5| |i6| |i8| |i9|
-
- 
-* `Argonne National Laboratory <http://www.anl.gov>`_
-* `CAMd, Technical University of Denmark <http://www.camp.dtu.dk>`_
-* `CSC, the Finnish IT center for science <http://www.csc.fi>`_
-* `Department of Applied Physics, Aalto University School of Science
-  <http://physics.aalto.fi>`_
-* `Department of Physics, University of Jyväskylä <http://www.phys.jyu.fi>`_
-* `Freiburg Materials Research Center <http://www.fmf.uni-freiburg.de>`_
-* `Institute of Physics, Tampere University of Technology <http://www.tut.fi>`_
-* `SUNCAT Center, Stanford University/SLAC <http://suncat.stanford.edu>`_
-* `PRACE, Partnership for Advanced Computing in Europe 
-  <http://www.prace-ri.eu/>`_
-
+.. include:: ytp.txt
 
 .. _news:
 
@@ -103,9 +87,6 @@ News
 * :ref:`GPAW version 0.7 <releasenotes>` released (Apr 23 2010)
 
 * GPAW is :math:`\Psi_k` `scientific highlight of the month`_ (Apr 3 2010)
-
-* GPAW now measures :ref:`code coverage <coverage>` of the test suite
-  (Nov 5 2009)
 
 * A third GPAW code sprint was successfully hosted at CAMD (Oct 20 2009)
 

@@ -159,7 +159,7 @@ Version 0.7
   cells.  It may actually work now!
 * Much better use of ScaLAPACK and BLACS.  All large matrices can now
   be distributed.
-* New test coverage pages for all files: :ref:`coverage`.
+* New test coverage pages for all files.
 * New default value for Poisson solver stencil: ``PoissonSolver(nn=3)``.
 * Much improved MPI module (:ref:`communicators`).
 * Self-consistent Meta GGA.

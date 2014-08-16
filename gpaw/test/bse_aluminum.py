@@ -4,7 +4,7 @@ from ase.lattice import bulk
 from gpaw import GPAW
 from gpaw.eigensolvers.rmm_diis_old import RMM_DIIS
 from gpaw.mixer import Mixer
-from gpaw.response.df import DF
+from gpaw.response.df0 import DF
 from gpaw.response.bse import BSE
 
 GS = 1

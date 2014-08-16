@@ -1,79 +1,89 @@
 #!/usr/bin/env python
 # Emacs: treat this as -*- python -*-
 
-from sys import argv
 import os
+import optparse
+import subprocess
 
-i = 1
-while not (os.path.isfile(argv[i]) and (argv[i].endswith('.py') or
-                                        os.access(argv[i], os.X_OK))):
-    i += 1
 
-options = ' '.join(argv[1:i])
-script = argv[i]
-job = ' '.join(argv[i:])
+parser = optparse.OptionParser()
+add = parser.add_option
 
+add('-l')
+add('-q')
+
+add('-n', '--threads', type=int, default=1)
+add('-g', '--gpaw')
+add('-x', '--export')
+
+opts, args = parser.parse_args()
+
+script = args[0]
+name = script.split('/')[-1]
+
+if opts.gpaw:
+    path = opts.gpaw
+else:
+    path = os.environ.get('GPAW_HOME')
+    if not path:
+        import gpaw
+        path = gpaw.__path__[0]
+        
+if opts.export:
+    export = opts.export.split(',')
+else:
+    export = []
+        
 qsub = '#!/usr/bin/env python\n'
-qsub += '#PBS -N %s\n' % script.split('/')[-1] # set default job name
+qsub += '#PBS -N %s\n' % name  # set default job name
 qsub += '#PBS -W umask=002\n'
 
-for line in open(script, 'r'):
+for line in open(script):
     if line.startswith('#PBS'):
         qsub += line
 
-qsub += """\
+qsub += 'job = %r\n' % args
+qsub += 'path = %r\n' % path
+qsub += 'nthreads = %d\n' % opts.threads
+qsub += 'export = %r\n' % export
+
+qsub += """
 import os
-import sys
-from gpaw import get_gpaw_python_path
+import subprocess
 
 nodename = os.uname()[1]
 c = nodename[0]
 assert c in 'abcdghinmqp'
 
-# use mpi_paffinity_alone if set as environment variable
-# http://www.open-mpi.de/faq/?category=tuning#setting-mca-params
-if os.environ.get('OMPI_MCA_mpi_paffinity_alone'):
-    mpi_paffinity_alone = '--mca mpi_paffinity_alone '+os.environ.get('OMPI_MCA_mpi_paffinity_alone')
-else:
-    mpi_paffinity_alone = ''
+nproc = len(open(os.environ['PBS_NODEFILE']).readlines())
 
-np = len(open(os.environ['PBS_NODEFILE']).readlines())
+cmd = ['mpiexec']
 
-if c in 'abcd':
+export.append('PYTHONPATH=%s:%s' % (path, os.environ.get('PYTHONPATH', '')))
+
+if c in 'ghi':
     # Intel Niflheim node:
-    if not (np % 8):
-        mpiexec = 'mpiexec ' + mpi_paffinity_alone
-    else:
-        # do not use mpi_paffinity_alone on partially filled nodes
-        mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec '
-elif c in 'ghi':
-    # Intel Niflheim node:
-    if not (np % 16):
-        mpiexec = 'mpiexec --mca btl ^tcp ' + mpi_paffinity_alone
-    else:
-        # do not use mpi_paffinity_alone on partially filled nodes
-        mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec --mca btl ^tcp '
-elif c in 'nmpq':
-    # Opteron Niflheim node:
-    if not (np % 4):
-        mpiexec = 'mpiexec ' + mpi_paffinity_alone
-    else:
-        # do not use mpi_paffinity_alone on partially filled nodes
-        mpiexec = 'unset OMPI_MCA_mpi_paffinity_alone&& mpiexec '
-    vers = sys.version[:3]
-else:
-    raise RuntimeError('Unknown node type')
+    cmd += ['--mca', 'btl', '^tcp']
+
+if nthreads > 1:
+    cmd += ['-np', str(nproc // nthreads), '--loadbalance']
+    export.append('OMP_NUM_THREADS=%d' % nthreads)
+
+for x in export:
+    cmd += ['-x', x]
+    
+cmd.append(os.path.join(path,
+                        'build',
+                        'bin.' + os.environ['GPAW_PLATFORM'],
+                        'gpaw-python'))
+cmd += job
+print(cmd)
+print subprocess.check_call(cmd)
 """
 
-# Start script:
-qsub += """
-path = get_gpaw_python_path()
-retcode = os.system('''%s %s/gpaw-python JOB''' % (mpiexec, path))
-if (retcode & 0xff) == 0:
-    sys.exit(retcode >> 8)  # No signal, return the status only.
-else:
-    sys.exit(retcode)  # Return everything, signalling failure.
-""".replace('JOB',
-            job.replace('(', '\\(').replace(')', '\\)').replace("'", "\\'"))
-
-os.popen('qsub ' + options, 'w').write(qsub)
+cmd = ['qsub']
+if opts.l:
+    cmd += ['-l', opts.l]
+if opts.q:
+    cmd += ['-q', opts.q]
+subprocess.Popen(cmd, stdin=subprocess.PIPE).communicate(qsub)

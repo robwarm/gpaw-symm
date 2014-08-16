@@ -39,9 +39,10 @@ Limit of optimizer steps: 100
 .. csv-table::
    :file: g2_dzp_relaxed_energy.csv
 
+
 HTB
 ===
-Unit cell stress relaxation using StrainFilter (see :mod:`constraints`) for
+Unit cell stress relaxation using StrainFilter (see :mod:`ase.constraints`) for
 bulk systems compilation by Haas, Tran, and Blaha (10.1103/PhysRevB.79.085104).
 The PBE optimization starts from LDA unit cells.
 

@@ -6,8 +6,8 @@ Exercises
 
 .. note::
 
-  **CAMd summer school 2012 participants**, please read
-  this :ref:`page <summerschool12>` before you start working on the
+  **CAMd summer school 2014 participants**, please read
+  this :ref:`page <summerschool14>` before you start working on the
   exercises.
 
 In order to do the exercises, it helps with a little bit of knowledge
@@ -52,15 +52,18 @@ Pick among them according to your interest.  You can also look at the :ref:`tuto
 .. toctree::
    :maxdepth: 1
 
-   vibrations/vibrations
-   stress/stress
    neb/neb
+   stm/stm
    wannier/wannier
-   iron/iron
    dos/dos
    band_structure/bands
-   stm/stm
-   tst/tst
+   vibrations/vibrations
+   iron/iron
+   eels/eels
+   gw/gw
+   rpa/rpa
+   dcdft/dcdft
+   stress/stress
    transport/transport
    lrtddft/lrtddft
 
@@ -73,3 +76,9 @@ Further information:
    
 For comments and questions, write to the :ref:`mailing_lists`.  You
 can also search in the mailing list archives on the same page.
+
+.. toctree::
+    :hidden:
+        
+    bse/bse
+    

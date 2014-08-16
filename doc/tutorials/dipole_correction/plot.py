@@ -5,7 +5,7 @@ matplotlib.rc('text', usetex=True)
 import matplotlib.pyplot as plt
 import ase.units as units
 from ase.io import write
-from gpaw import restart, GPAW
+from gpaw import GPAW
 from gpaw.poisson import PoissonSolver
 from gpaw.dipole_correction import DipoleCorrection
 
@@ -34,11 +34,11 @@ for name in ['zero', 'periodic', 'corrected']:
     
     if name == 'corrected':
         plt.plot([0.2, 0.2], [efermi, v[0]], 'r:')
-        plt.text(0.23, (efermi + v[0]) / 2, 
-            '$\phi$ = %.2f eV' % (v[0] - efermi), va='center')
+        plt.text(0.23, (efermi + v[0]) / 2,
+                 '$\phi$ = %.2f eV' % (v[0] - efermi), va='center')
         plt.plot([z[-1] - 0.2, z[-1] - 0.2], [efermi, v[-1]], 'r:')
-        plt.text(z[-1] - 0.23, (efermi + v[-1]) / 2, 
-            '$\phi$ = %.2f eV' % (v[-1] - efermi), va='center', ha='right')
+        plt.text(z[-1] - 0.23, (efermi + v[-1]) / 2,
+                 '$\phi$ = %.2f eV' % (v[-1] - efermi), va='center', ha='right')
     
     plt.xlabel('$z$, $\AA$')
     plt.ylabel('(Pseudo) electrostatic potential, V')

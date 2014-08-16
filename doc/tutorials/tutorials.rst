@@ -45,9 +45,9 @@ Specialized tutorials
    neb/neb
    pbe0/pbe0
    xas/xas
-   negfstm/negfstm
    dielectric_response/dielectric_response
    rpa/rpa_tut
+   fxc_correlation/rapbe_tut
    H2/ensembles
    gw_tutorial/gw_tutorial
    atomization_cmr/atomization_cmr

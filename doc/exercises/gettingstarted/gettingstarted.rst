@@ -14,8 +14,8 @@ system.  This involves multiple calculations of the atomic forces
 respect to the atomic positions :math:`\mathbf R^a` as the atoms
 are moved downhill according to an optimization algorithm.
 
-The following script uses the *EMT calculator* to optimize the
-structure of :mol:`H_2`.
+The following script uses the :mod:`EMT calculator <ase.calculators.emt>`
+to optimize the structure of :mol:`H_2`.
 
 .. literalinclude:: h2.emt.py
 
@@ -30,11 +30,11 @@ are in order:
   *calculator* can evaluate
   quantities such as energies and forces on a collection of atoms.
   There are different kinds of calculators, and EMT is a particularly
-  simple one.  The calculator is associated with the :class:`Atoms`
+  simple one.  The calculator is associated with the :class:`~ase.atoms.Atoms`
   object by calling ``atoms.set_calculator(calc)``.
-* A :class:`~ase.optimize.bfgs.BFGS` optimizer is created and
+* An :mod:`optimizer <ase.optimize>` is created and
   associated with the
-  :class:`Atoms` object.  It is also given an optional argument,
+  :class:`~ase.atoms.Atoms` object.  It is also given an optional argument,
   ``trajectory``, which specifies the name of a file into which the
   positions will be saved for each step in the geometry optimization.
 * Finally the call ``opt.run(fmax=0.05)`` will run the
@@ -62,7 +62,7 @@ The empirical EMT potential is fast, but not very accurate for
 molecules in particular.  We therefore want to perform this
 calculation in GPAW instead.  GPAW uses real-space grids to represent
 density and wavefunctions, and the grids exist in a cell.  For this
-reason you must set a cell for the :class:`ase.Atoms` object.  As a
+reason you must set a cell for the :class:`~ase.atoms.Atoms` object.  As a
 coarse value let us use a 6 Ångström cell::
 
   system.set_cell((6.0, 6.0, 6.0))
@@ -128,5 +128,5 @@ different XC functionals to the calculator using
 :samp:`GPAW(xc={name})`, where :samp:`{name}` is a string such as
 ``'LDA'``, ``'PBE'`` or ``'RPBE'``.
 
-Calculate the atomization energy of :mol:`H_2O` with LDA and PBE (just
-reuse the geometry from the LDA optimization, i.e. do not repeat the minimization).
+Calculate the atomization energy of :mol:`H_2O` with LDA and PBE (just reuse
+the geometry from the LDA optimization, i.e. do not repeat the minimization).

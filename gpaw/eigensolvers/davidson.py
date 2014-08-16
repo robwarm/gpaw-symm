@@ -24,10 +24,13 @@ class Davidson(Eigensolver):
     def __init__(self, niter=1, smin=None, normalize=True):
         Eigensolver.__init__(self)
         self.niter = niter
-        if not smin is None:
-            raise NotImplementedError('See https://trac.fysik.dtu.dk/projects/gpaw/ticket/248')
         self.smin = smin
         self.normalize = normalize
+
+        if smin is not None:
+            raise NotImplementedError(
+                'See https://trac.fysik.dtu.dk/projects/gpaw/ticket/248')
+
         self.orthonormalization_required = False
 
     def __repr__(self):
